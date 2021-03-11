@@ -1,0 +1,1126 @@
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 28, 1
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"i2c_oled.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.section	.text.gpio_setup,"ax",%progbits
+  17              		.align	1
+  18              		.syntax unified
+  19              		.thumb
+  20              		.thumb_func
+  21              		.fpu fpv5-d16
+  23              	gpio_setup:
+  24              	.LFB8:
+  25              		.file 1 "Core/Src/i2c_oled.c"
+   1:Core/Src/i2c_oled.c **** #include "i2c_oled.h"
+   2:Core/Src/i2c_oled.c **** 
+   3:Core/Src/i2c_oled.c **** void *_sbrk(int incr) { return (void *)-1; }
+   4:Core/Src/i2c_oled.c **** 
+   5:Core/Src/i2c_oled.c **** char buffer[50];
+   6:Core/Src/i2c_oled.c **** 
+   7:Core/Src/i2c_oled.c **** 
+   8:Core/Src/i2c_oled.c **** static inline void
+   9:Core/Src/i2c_oled.c **** uart_putc(char ch) {
+  10:Core/Src/i2c_oled.c **** 	usart_send_blocking(USART3,ch);  //USART3 is connected to ST-link serial com
+  11:Core/Src/i2c_oled.c **** }
+  12:Core/Src/i2c_oled.c **** 
+  13:Core/Src/i2c_oled.c **** static int
+  14:Core/Src/i2c_oled.c **** uart_printf(const char *format,...) {
+  15:Core/Src/i2c_oled.c **** 	va_list args;
+  16:Core/Src/i2c_oled.c **** 	int rc;
+  17:Core/Src/i2c_oled.c **** 
+  18:Core/Src/i2c_oled.c **** 	va_start(args,format);
+  19:Core/Src/i2c_oled.c **** 	rc = mini_vprintf_cooked(uart_putc,format,args);
+  20:Core/Src/i2c_oled.c **** 	va_end(args);
+  21:Core/Src/i2c_oled.c **** 	return rc;
+  22:Core/Src/i2c_oled.c **** }
+  23:Core/Src/i2c_oled.c **** 
+  24:Core/Src/i2c_oled.c **** 
+  25:Core/Src/i2c_oled.c **** uint32_t ticks=0;
+  26:Core/Src/i2c_oled.c **** 
+  27:Core/Src/i2c_oled.c **** static void clock_setup(void)
+  28:Core/Src/i2c_oled.c **** {
+  29:Core/Src/i2c_oled.c **** 	rcc_clock_setup_hsi(&rcc_3v3[RCC_CLOCK_3V3_216MHZ]);
+  30:Core/Src/i2c_oled.c **** 	/* Enable GPIOC clock. */
+  31:Core/Src/i2c_oled.c **** 	rcc_periph_clock_enable(RCC_GPIOB);
+  32:Core/Src/i2c_oled.c **** 	rcc_periph_clock_enable(RCC_GPIOD);
+  33:Core/Src/i2c_oled.c **** 	
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 2
+
+
+  34:Core/Src/i2c_oled.c **** }
+  35:Core/Src/i2c_oled.c **** 
+  36:Core/Src/i2c_oled.c **** void init_usart(void) {
+  37:Core/Src/i2c_oled.c **** 
+  38:Core/Src/i2c_oled.c **** 	//////////////////////////////////////////////////////////////
+  39:Core/Src/i2c_oled.c **** 	// STM32F7:
+  40:Core/Src/i2c_oled.c **** 	//	RX:	-
+  41:Core/Src/i2c_oled.c **** 	//	TX:	D8
+  42:Core/Src/i2c_oled.c **** 	//	Baud:	115200
+  43:Core/Src/i2c_oled.c **** 	//////////////////////////////////////////////////////////////
+  44:Core/Src/i2c_oled.c **** 	gpio_mode_setup(GPIOD, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO8);
+  45:Core/Src/i2c_oled.c **** 	gpio_set_output_options(GPIOD,GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,GPIO8);
+  46:Core/Src/i2c_oled.c **** 	gpio_set_af(GPIOD, GPIO_AF7, GPIO8); //set PD8 to UART3_tx
+  47:Core/Src/i2c_oled.c **** 
+  48:Core/Src/i2c_oled.c **** 	rcc_periph_clock_enable(RCC_USART3);
+  49:Core/Src/i2c_oled.c **** 
+  50:Core/Src/i2c_oled.c **** 	usart_set_baudrate(USART3,9600);
+  51:Core/Src/i2c_oled.c **** 	usart_set_databits(USART3,8);
+  52:Core/Src/i2c_oled.c **** 	usart_set_stopbits(USART3,USART_STOPBITS_1);
+  53:Core/Src/i2c_oled.c **** 	usart_set_mode(USART3,USART_MODE_TX);
+  54:Core/Src/i2c_oled.c **** 	usart_set_parity(USART3,USART_PARITY_NONE);
+  55:Core/Src/i2c_oled.c **** 	usart_set_flow_control(USART3,USART_FLOWCONTROL_NONE);
+  56:Core/Src/i2c_oled.c **** 	usart_enable(USART3);
+  57:Core/Src/i2c_oled.c **** }
+  58:Core/Src/i2c_oled.c **** 
+  59:Core/Src/i2c_oled.c **** static void gpio_setup(void)
+  60:Core/Src/i2c_oled.c **** {
+  26              		.loc 1 60 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 0, uses_anonymous_args = 0
+  30 0000 10B5     		push	{r4, lr}
+  31              	.LCFI0:
+  32              		.cfi_def_cfa_offset 8
+  33              		.cfi_offset 4, -8
+  34              		.cfi_offset 14, -4
+  61:Core/Src/i2c_oled.c **** 	/* Set GPIOB0 LED to 'output' */
+  62:Core/Src/i2c_oled.c **** 	gpio_mode_setup(GPIOB, GPIO_MODE_OUTPUT,
+  35              		.loc 1 62 0
+  36 0002 074C     		ldr	r4, .L3
+  37 0004 0123     		movs	r3, #1
+  38 0006 0022     		movs	r2, #0
+  39 0008 1946     		mov	r1, r3
+  40 000a 2046     		mov	r0, r4
+  41 000c FFF7FEFF 		bl	gpio_mode_setup
+  42              	.LVL0:
+  63:Core/Src/i2c_oled.c **** 		      GPIO_PUPD_NONE, GPIO0);
+  64:Core/Src/i2c_oled.c **** 
+  65:Core/Src/i2c_oled.c **** 	gpio_set_output_options(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ,GPIO0);
+  43              		.loc 1 65 0
+  44 0010 0123     		movs	r3, #1
+  45 0012 0022     		movs	r2, #0
+  46 0014 1146     		mov	r1, r2
+  47 0016 2046     		mov	r0, r4
+  48 0018 FFF7FEFF 		bl	gpio_set_output_options
+  49              	.LVL1:
+  66:Core/Src/i2c_oled.c **** 
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 3
+
+
+  67:Core/Src/i2c_oled.c **** 
+  68:Core/Src/i2c_oled.c **** }
+  50              		.loc 1 68 0
+  51 001c 10BD     		pop	{r4, pc}
+  52              	.L4:
+  53 001e 00BF     		.align	2
+  54              	.L3:
+  55 0020 00040240 		.word	1073873920
+  56              		.cfi_endproc
+  57              	.LFE8:
+  59              		.section	.text.clock_setup,"ax",%progbits
+  60              		.align	1
+  61              		.syntax unified
+  62              		.thumb
+  63              		.thumb_func
+  64              		.fpu fpv5-d16
+  66              	clock_setup:
+  67              	.LFB6:
+  28:Core/Src/i2c_oled.c **** 	rcc_clock_setup_hsi(&rcc_3v3[RCC_CLOCK_3V3_216MHZ]);
+  68              		.loc 1 28 0
+  69              		.cfi_startproc
+  70              		@ args = 0, pretend = 0, frame = 0
+  71              		@ frame_needed = 0, uses_anonymous_args = 0
+  72 0000 08B5     		push	{r3, lr}
+  73              	.LCFI1:
+  74              		.cfi_def_cfa_offset 8
+  75              		.cfi_offset 3, -8
+  76              		.cfi_offset 14, -4
+  29:Core/Src/i2c_oled.c **** 	/* Enable GPIOC clock. */
+  77              		.loc 1 29 0
+  78 0002 0648     		ldr	r0, .L7
+  79 0004 FFF7FEFF 		bl	rcc_clock_setup_hsi
+  80              	.LVL2:
+  31:Core/Src/i2c_oled.c **** 	rcc_periph_clock_enable(RCC_GPIOD);
+  81              		.loc 1 31 0
+  82 0008 40F20160 		movw	r0, #1537
+  83 000c FFF7FEFF 		bl	rcc_periph_clock_enable
+  84              	.LVL3:
+  32:Core/Src/i2c_oled.c **** 	
+  85              		.loc 1 32 0
+  86 0010 40F20360 		movw	r0, #1539
+  87 0014 FFF7FEFF 		bl	rcc_periph_clock_enable
+  88              	.LVL4:
+  34:Core/Src/i2c_oled.c **** 
+  89              		.loc 1 34 0
+  90 0018 08BD     		pop	{r3, pc}
+  91              	.L8:
+  92 001a 00BF     		.align	2
+  93              	.L7:
+  94 001c 00000000 		.word	rcc_3v3
+  95              		.cfi_endproc
+  96              	.LFE6:
+  98              		.section	.text.i2c1_setup,"ax",%progbits
+  99              		.align	1
+ 100              		.syntax unified
+ 101              		.thumb
+ 102              		.thumb_func
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 4
+
+
+ 103              		.fpu fpv5-d16
+ 105              	i2c1_setup:
+ 106              	.LFB9:
+  69:Core/Src/i2c_oled.c **** 
+  70:Core/Src/i2c_oled.c **** static void i2c1_setup(){
+ 107              		.loc 1 70 0
+ 108              		.cfi_startproc
+ 109              		@ args = 0, pretend = 0, frame = 0
+ 110              		@ frame_needed = 0, uses_anonymous_args = 0
+ 111 0000 38B5     		push	{r3, r4, r5, lr}
+ 112              	.LCFI2:
+ 113              		.cfi_def_cfa_offset 16
+ 114              		.cfi_offset 3, -16
+ 115              		.cfi_offset 4, -12
+ 116              		.cfi_offset 5, -8
+ 117              		.cfi_offset 14, -4
+  71:Core/Src/i2c_oled.c **** 	RCC_DCKCFGR2|= (RCC_DCKCFGR2_UARTxSEL_HSI<<RCC_DCKCFGR2_I2C1SEL_SHIFT); //set i2c1 clock to HSI = 
+ 118              		.loc 1 71 0
+ 119 0002 1C4A     		ldr	r2, .L11
+ 120 0004 1368     		ldr	r3, [r2]
+ 121 0006 43F40033 		orr	r3, r3, #131072
+ 122 000a 1360     		str	r3, [r2]
+  72:Core/Src/i2c_oled.c **** 	rcc_periph_clock_enable(RCC_I2C1);
+ 123              		.loc 1 72 0
+ 124 000c 40F61500 		movw	r0, #2069
+ 125 0010 FFF7FEFF 		bl	rcc_periph_clock_enable
+ 126              	.LVL5:
+  73:Core/Src/i2c_oled.c **** 	
+  74:Core/Src/i2c_oled.c **** 	i2c_reset(I2C_OLED);
+ 127              		.loc 1 74 0
+ 128 0014 184C     		ldr	r4, .L11+4
+ 129 0016 2046     		mov	r0, r4
+ 130 0018 FFF7FEFF 		bl	i2c_reset
+ 131              	.LVL6:
+  75:Core/Src/i2c_oled.c **** 	gpio_mode_setup(
+ 132              		.loc 1 75 0
+ 133 001c 174D     		ldr	r5, .L11+8
+ 134 001e 4FF44073 		mov	r3, #768
+ 135 0022 0022     		movs	r2, #0
+ 136 0024 0221     		movs	r1, #2
+ 137 0026 2846     		mov	r0, r5
+ 138 0028 FFF7FEFF 		bl	gpio_mode_setup
+ 139              	.LVL7:
+  76:Core/Src/i2c_oled.c **** 		GPIOB,
+  77:Core/Src/i2c_oled.c ****       	GPIO_MODE_AF,
+  78:Core/Src/i2c_oled.c ****       	GPIO_PUPD_NONE,
+  79:Core/Src/i2c_oled.c ****       	GPIO8|GPIO9		//  SCL|SDA
+  80:Core/Src/i2c_oled.c **** 	);
+  81:Core/Src/i2c_oled.c **** 	gpio_set_output_options(
+ 140              		.loc 1 81 0
+ 141 002c 4FF44073 		mov	r3, #768
+ 142 0030 0222     		movs	r2, #2
+ 143 0032 0121     		movs	r1, #1
+ 144 0034 2846     		mov	r0, r5
+ 145 0036 FFF7FEFF 		bl	gpio_set_output_options
+ 146              	.LVL8:
+  82:Core/Src/i2c_oled.c **** 		GPIOB,
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 5
+
+
+  83:Core/Src/i2c_oled.c **** 		GPIO_OTYPE_OD,
+  84:Core/Src/i2c_oled.c **** 		GPIO_OSPEED_50MHZ,
+  85:Core/Src/i2c_oled.c **** 		GPIO8|GPIO9
+  86:Core/Src/i2c_oled.c **** 	);
+  87:Core/Src/i2c_oled.c **** 	gpio_set_af(GPIOB,GPIO_AF4,GPIO8|GPIO9); //set to AF4 => i2c1
+ 147              		.loc 1 87 0
+ 148 003a 4FF44072 		mov	r2, #768
+ 149 003e 0421     		movs	r1, #4
+ 150 0040 2846     		mov	r0, r5
+ 151 0042 FFF7FEFF 		bl	gpio_set_af
+ 152              	.LVL9:
+  88:Core/Src/i2c_oled.c **** 	
+  89:Core/Src/i2c_oled.c **** 	i2c_peripheral_disable(I2C_OLED);
+ 153              		.loc 1 89 0
+ 154 0046 2046     		mov	r0, r4
+ 155 0048 FFF7FEFF 		bl	i2c_peripheral_disable
+ 156              	.LVL10:
+  90:Core/Src/i2c_oled.c **** 	i2c_enable_analog_filter(I2C_OLED);
+ 157              		.loc 1 90 0
+ 158 004c 2046     		mov	r0, r4
+ 159 004e FFF7FEFF 		bl	i2c_enable_analog_filter
+ 160              	.LVL11:
+  91:Core/Src/i2c_oled.c **** 	i2c_set_digital_filter(I2C_OLED, 0);
+ 161              		.loc 1 91 0
+ 162 0052 0021     		movs	r1, #0
+ 163 0054 2046     		mov	r0, r4
+ 164 0056 FFF7FEFF 		bl	i2c_set_digital_filter
+ 165              	.LVL12:
+  92:Core/Src/i2c_oled.c **** 	i2c_set_speed(I2C_OLED,i2c_speed_fm_400k,rcc_get_spi_clk_freq(I2C_OLED));
+ 166              		.loc 1 92 0
+ 167 005a 2046     		mov	r0, r4
+ 168 005c FFF7FEFF 		bl	rcc_get_spi_clk_freq
+ 169              	.LVL13:
+ 170 0060 0246     		mov	r2, r0
+ 171 0062 0121     		movs	r1, #1
+ 172 0064 2046     		mov	r0, r4
+ 173 0066 FFF7FEFF 		bl	i2c_set_speed
+ 174              	.LVL14:
+  93:Core/Src/i2c_oled.c **** 	
+  94:Core/Src/i2c_oled.c **** 	i2c_peripheral_enable(I2C_OLED);
+ 175              		.loc 1 94 0
+ 176 006a 2046     		mov	r0, r4
+ 177 006c FFF7FEFF 		bl	i2c_peripheral_enable
+ 178              	.LVL15:
+  95:Core/Src/i2c_oled.c **** }
+ 179              		.loc 1 95 0
+ 180 0070 38BD     		pop	{r3, r4, r5, pc}
+ 181              	.L12:
+ 182 0072 00BF     		.align	2
+ 183              	.L11:
+ 184 0074 90380240 		.word	1073887376
+ 185 0078 00540040 		.word	1073763328
+ 186 007c 00040240 		.word	1073873920
+ 187              		.cfi_endproc
+ 188              	.LFE9:
+ 190              		.section	.text.uart_printf,"ax",%progbits
+ 191              		.align	1
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 6
+
+
+ 192              		.syntax unified
+ 193              		.thumb
+ 194              		.thumb_func
+ 195              		.fpu fpv5-d16
+ 197              	uart_printf:
+ 198              	.LFB5:
+  14:Core/Src/i2c_oled.c **** 	va_list args;
+ 199              		.loc 1 14 0
+ 200              		.cfi_startproc
+ 201              		@ args = 4, pretend = 16, frame = 8
+ 202              		@ frame_needed = 0, uses_anonymous_args = 1
+ 203              	.LVL16:
+ 204 0000 0FB4     		push	{r0, r1, r2, r3}
+ 205              	.LCFI3:
+ 206              		.cfi_def_cfa_offset 16
+ 207              		.cfi_offset 0, -16
+ 208              		.cfi_offset 1, -12
+ 209              		.cfi_offset 2, -8
+ 210              		.cfi_offset 3, -4
+ 211 0002 00B5     		push	{lr}
+ 212              	.LCFI4:
+ 213              		.cfi_def_cfa_offset 20
+ 214              		.cfi_offset 14, -20
+ 215 0004 83B0     		sub	sp, sp, #12
+ 216              	.LCFI5:
+ 217              		.cfi_def_cfa_offset 32
+ 218 0006 04AA     		add	r2, sp, #16
+ 219 0008 52F8041B 		ldr	r1, [r2], #4
+  18:Core/Src/i2c_oled.c **** 	rc = mini_vprintf_cooked(uart_putc,format,args);
+ 220              		.loc 1 18 0
+ 221 000c 0192     		str	r2, [sp, #4]
+  19:Core/Src/i2c_oled.c **** 	va_end(args);
+ 222              		.loc 1 19 0
+ 223 000e 0448     		ldr	r0, .L15
+ 224 0010 FFF7FEFF 		bl	mini_vprintf_cooked
+ 225              	.LVL17:
+  22:Core/Src/i2c_oled.c **** 
+ 226              		.loc 1 22 0
+ 227 0014 03B0     		add	sp, sp, #12
+ 228              	.LCFI6:
+ 229              		.cfi_def_cfa_offset 20
+ 230              		@ sp needed
+ 231 0016 5DF804EB 		ldr	lr, [sp], #4
+ 232              	.LCFI7:
+ 233              		.cfi_restore 14
+ 234              		.cfi_def_cfa_offset 16
+ 235 001a 04B0     		add	sp, sp, #16
+ 236              	.LCFI8:
+ 237              		.cfi_restore 3
+ 238              		.cfi_restore 2
+ 239              		.cfi_restore 1
+ 240              		.cfi_restore 0
+ 241              		.cfi_def_cfa_offset 0
+ 242 001c 7047     		bx	lr
+ 243              	.L16:
+ 244 001e 00BF     		.align	2
+ 245              	.L15:
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 7
+
+
+ 246 0020 00000000 		.word	uart_putc
+ 247              		.cfi_endproc
+ 248              	.LFE5:
+ 250              		.section	.text.uart_putc,"ax",%progbits
+ 251              		.align	1
+ 252              		.syntax unified
+ 253              		.thumb
+ 254              		.thumb_func
+ 255              		.fpu fpv5-d16
+ 257              	uart_putc:
+ 258              	.LFB4:
+   9:Core/Src/i2c_oled.c **** 	usart_send_blocking(USART3,ch);  //USART3 is connected to ST-link serial com
+ 259              		.loc 1 9 0
+ 260              		.cfi_startproc
+ 261              		@ args = 0, pretend = 0, frame = 0
+ 262              		@ frame_needed = 0, uses_anonymous_args = 0
+ 263              	.LVL18:
+ 264 0000 08B5     		push	{r3, lr}
+ 265              	.LCFI9:
+ 266              		.cfi_def_cfa_offset 8
+ 267              		.cfi_offset 3, -8
+ 268              		.cfi_offset 14, -4
+  10:Core/Src/i2c_oled.c **** }
+ 269              		.loc 1 10 0
+ 270 0002 0146     		mov	r1, r0
+ 271 0004 0148     		ldr	r0, .L19
+ 272              	.LVL19:
+ 273 0006 FFF7FEFF 		bl	usart_send_blocking
+ 274              	.LVL20:
+  11:Core/Src/i2c_oled.c **** 
+ 275              		.loc 1 11 0
+ 276 000a 08BD     		pop	{r3, pc}
+ 277              	.L20:
+ 278              		.align	2
+ 279              	.L19:
+ 280 000c 00480040 		.word	1073760256
+ 281              		.cfi_endproc
+ 282              	.LFE4:
+ 284              		.section	.text._sbrk,"ax",%progbits
+ 285              		.align	1
+ 286              		.global	_sbrk
+ 287              		.syntax unified
+ 288              		.thumb
+ 289              		.thumb_func
+ 290              		.fpu fpv5-d16
+ 292              	_sbrk:
+ 293              	.LFB3:
+   3:Core/Src/i2c_oled.c **** 
+ 294              		.loc 1 3 0
+ 295              		.cfi_startproc
+ 296              		@ args = 0, pretend = 0, frame = 0
+ 297              		@ frame_needed = 0, uses_anonymous_args = 0
+ 298              		@ link register save eliminated.
+ 299              	.LVL21:
+   3:Core/Src/i2c_oled.c **** 
+ 300              		.loc 1 3 0
+ 301 0000 4FF0FF30 		mov	r0, #-1
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 8
+
+
+ 302              	.LVL22:
+ 303 0004 7047     		bx	lr
+ 304              		.cfi_endproc
+ 305              	.LFE3:
+ 307              		.section	.text.init_usart,"ax",%progbits
+ 308              		.align	1
+ 309              		.global	init_usart
+ 310              		.syntax unified
+ 311              		.thumb
+ 312              		.thumb_func
+ 313              		.fpu fpv5-d16
+ 315              	init_usart:
+ 316              	.LFB7:
+  36:Core/Src/i2c_oled.c **** 
+ 317              		.loc 1 36 0
+ 318              		.cfi_startproc
+ 319              		@ args = 0, pretend = 0, frame = 0
+ 320              		@ frame_needed = 0, uses_anonymous_args = 0
+ 321 0000 10B5     		push	{r4, lr}
+ 322              	.LCFI10:
+ 323              		.cfi_def_cfa_offset 8
+ 324              		.cfi_offset 4, -8
+ 325              		.cfi_offset 14, -4
+  44:Core/Src/i2c_oled.c **** 	gpio_set_output_options(GPIOD,GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,GPIO8);
+ 326              		.loc 1 44 0
+ 327 0002 1C4C     		ldr	r4, .L24
+ 328 0004 4FF48073 		mov	r3, #256
+ 329 0008 0022     		movs	r2, #0
+ 330 000a 0221     		movs	r1, #2
+ 331 000c 2046     		mov	r0, r4
+ 332 000e FFF7FEFF 		bl	gpio_mode_setup
+ 333              	.LVL23:
+  45:Core/Src/i2c_oled.c **** 	gpio_set_af(GPIOD, GPIO_AF7, GPIO8); //set PD8 to UART3_tx
+ 334              		.loc 1 45 0
+ 335 0012 4FF48073 		mov	r3, #256
+ 336 0016 0222     		movs	r2, #2
+ 337 0018 0021     		movs	r1, #0
+ 338 001a 2046     		mov	r0, r4
+ 339 001c FFF7FEFF 		bl	gpio_set_output_options
+ 340              	.LVL24:
+  46:Core/Src/i2c_oled.c **** 
+ 341              		.loc 1 46 0
+ 342 0020 4FF48072 		mov	r2, #256
+ 343 0024 0721     		movs	r1, #7
+ 344 0026 2046     		mov	r0, r4
+ 345 0028 FFF7FEFF 		bl	gpio_set_af
+ 346              	.LVL25:
+  48:Core/Src/i2c_oled.c **** 
+ 347              		.loc 1 48 0
+ 348 002c 40F61200 		movw	r0, #2066
+ 349 0030 FFF7FEFF 		bl	rcc_periph_clock_enable
+ 350              	.LVL26:
+  50:Core/Src/i2c_oled.c **** 	usart_set_databits(USART3,8);
+ 351              		.loc 1 50 0
+ 352 0034 A4F5E234 		sub	r4, r4, #115712
+ 353 0038 4FF41651 		mov	r1, #9600
+ 354 003c 2046     		mov	r0, r4
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 9
+
+
+ 355 003e FFF7FEFF 		bl	usart_set_baudrate
+ 356              	.LVL27:
+  51:Core/Src/i2c_oled.c **** 	usart_set_stopbits(USART3,USART_STOPBITS_1);
+ 357              		.loc 1 51 0
+ 358 0042 0821     		movs	r1, #8
+ 359 0044 2046     		mov	r0, r4
+ 360 0046 FFF7FEFF 		bl	usart_set_databits
+ 361              	.LVL28:
+  52:Core/Src/i2c_oled.c **** 	usart_set_mode(USART3,USART_MODE_TX);
+ 362              		.loc 1 52 0
+ 363 004a 0021     		movs	r1, #0
+ 364 004c 2046     		mov	r0, r4
+ 365 004e FFF7FEFF 		bl	usart_set_stopbits
+ 366              	.LVL29:
+  53:Core/Src/i2c_oled.c **** 	usart_set_parity(USART3,USART_PARITY_NONE);
+ 367              		.loc 1 53 0
+ 368 0052 0821     		movs	r1, #8
+ 369 0054 2046     		mov	r0, r4
+ 370 0056 FFF7FEFF 		bl	usart_set_mode
+ 371              	.LVL30:
+  54:Core/Src/i2c_oled.c **** 	usart_set_flow_control(USART3,USART_FLOWCONTROL_NONE);
+ 372              		.loc 1 54 0
+ 373 005a 0021     		movs	r1, #0
+ 374 005c 2046     		mov	r0, r4
+ 375 005e FFF7FEFF 		bl	usart_set_parity
+ 376              	.LVL31:
+  55:Core/Src/i2c_oled.c **** 	usart_enable(USART3);
+ 377              		.loc 1 55 0
+ 378 0062 0021     		movs	r1, #0
+ 379 0064 2046     		mov	r0, r4
+ 380 0066 FFF7FEFF 		bl	usart_set_flow_control
+ 381              	.LVL32:
+  56:Core/Src/i2c_oled.c **** }
+ 382              		.loc 1 56 0
+ 383 006a 2046     		mov	r0, r4
+ 384 006c FFF7FEFF 		bl	usart_enable
+ 385              	.LVL33:
+  57:Core/Src/i2c_oled.c **** 
+ 386              		.loc 1 57 0
+ 387 0070 10BD     		pop	{r4, pc}
+ 388              	.L25:
+ 389 0072 00BF     		.align	2
+ 390              	.L24:
+ 391 0074 000C0240 		.word	1073875968
+ 392              		.cfi_endproc
+ 393              	.LFE7:
+ 395              		.section	.text.delay_setup,"ax",%progbits
+ 396              		.align	1
+ 397              		.global	delay_setup
+ 398              		.syntax unified
+ 399              		.thumb
+ 400              		.thumb_func
+ 401              		.fpu fpv5-d16
+ 403              	delay_setup:
+ 404              	.LFB10:
+  96:Core/Src/i2c_oled.c **** void delay_setup(void)
+  97:Core/Src/i2c_oled.c **** {
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 10
+
+
+ 405              		.loc 1 97 0
+ 406              		.cfi_startproc
+ 407              		@ args = 0, pretend = 0, frame = 0
+ 408              		@ frame_needed = 0, uses_anonymous_args = 0
+ 409 0000 10B5     		push	{r4, lr}
+ 410              	.LCFI11:
+ 411              		.cfi_def_cfa_offset 8
+ 412              		.cfi_offset 4, -8
+ 413              		.cfi_offset 14, -4
+  98:Core/Src/i2c_oled.c **** 	/* set up a microsecond free running timer for ... things... */
+  99:Core/Src/i2c_oled.c **** 	rcc_periph_clock_enable(RCC_TIM6);
+ 414              		.loc 1 99 0
+ 415 0002 40F60400 		movw	r0, #2052
+ 416 0006 FFF7FEFF 		bl	rcc_periph_clock_enable
+ 417              	.LVL34:
+ 100:Core/Src/i2c_oled.c **** 	/* microsecond counter */
+ 101:Core/Src/i2c_oled.c **** 	timer_set_prescaler(TIM6, 54000); //TIMx are clocked 2*apbx ; increment each 1us
+ 418              		.loc 1 101 0
+ 419 000a 154C     		ldr	r4, .L28
+ 420 000c 4DF2F021 		movw	r1, #54000
+ 421 0010 2046     		mov	r0, r4
+ 422 0012 FFF7FEFF 		bl	timer_set_prescaler
+ 423              	.LVL35:
+ 102:Core/Src/i2c_oled.c **** 	timer_set_period(TIM6, 0xFFFF); //OF each ms
+ 424              		.loc 1 102 0
+ 425 0016 4FF6FF71 		movw	r1, #65535
+ 426 001a 2046     		mov	r0, r4
+ 427 001c FFF7FEFF 		bl	timer_set_period
+ 428              	.LVL36:
+ 103:Core/Src/i2c_oled.c **** 	timer_one_shot_mode(TIM6);
+ 429              		.loc 1 103 0
+ 430 0020 2046     		mov	r0, r4
+ 431 0022 FFF7FEFF 		bl	timer_one_shot_mode
+ 432              	.LVL37:
+ 104:Core/Src/i2c_oled.c **** 
+ 105:Core/Src/i2c_oled.c **** 	/* set up a microsecond free running timer for ... things... */
+ 106:Core/Src/i2c_oled.c **** 	rcc_periph_clock_enable(RCC_TIM7);
+ 433              		.loc 1 106 0
+ 434 0026 40F60500 		movw	r0, #2053
+ 435 002a FFF7FEFF 		bl	rcc_periph_clock_enable
+ 436              	.LVL38:
+ 107:Core/Src/i2c_oled.c **** 	/* microsecond counter */
+ 108:Core/Src/i2c_oled.c **** 	timer_set_prescaler(TIM7, 108); //TIMx are clocked 2*apbx ; increment each 1us
+ 437              		.loc 1 108 0
+ 438 002e 04F58064 		add	r4, r4, #1024
+ 439 0032 6C21     		movs	r1, #108
+ 440 0034 2046     		mov	r0, r4
+ 441 0036 FFF7FEFF 		bl	timer_set_prescaler
+ 442              	.LVL39:
+ 109:Core/Src/i2c_oled.c **** 	timer_set_period(TIM7, 0x3E8); //OF each ms
+ 443              		.loc 1 109 0
+ 444 003a 4FF47A71 		mov	r1, #1000
+ 445 003e 2046     		mov	r0, r4
+ 446 0040 FFF7FEFF 		bl	timer_set_period
+ 447              	.LVL40:
+ 110:Core/Src/i2c_oled.c **** 	timer_continuous_mode(TIM7);
+ 448              		.loc 1 110 0
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 11
+
+
+ 449 0044 2046     		mov	r0, r4
+ 450 0046 FFF7FEFF 		bl	timer_continuous_mode
+ 451              	.LVL41:
+ 111:Core/Src/i2c_oled.c **** 	nvic_enable_irq(NVIC_TIM7_IRQ);
+ 452              		.loc 1 111 0
+ 453 004a 3720     		movs	r0, #55
+ 454 004c FFF7FEFF 		bl	nvic_enable_irq
+ 455              	.LVL42:
+ 112:Core/Src/i2c_oled.c **** 	timer_enable_irq(TIM7,TIM_DIER_UIE);
+ 456              		.loc 1 112 0
+ 457 0050 0121     		movs	r1, #1
+ 458 0052 2046     		mov	r0, r4
+ 459 0054 FFF7FEFF 		bl	timer_enable_irq
+ 460              	.LVL43:
+ 113:Core/Src/i2c_oled.c **** 	timer_enable_counter(TIM7);
+ 461              		.loc 1 113 0
+ 462 0058 2046     		mov	r0, r4
+ 463 005a FFF7FEFF 		bl	timer_enable_counter
+ 464              	.LVL44:
+ 114:Core/Src/i2c_oled.c **** 	
+ 115:Core/Src/i2c_oled.c **** }
+ 465              		.loc 1 115 0
+ 466 005e 10BD     		pop	{r4, pc}
+ 467              	.L29:
+ 468              		.align	2
+ 469              	.L28:
+ 470 0060 00100040 		.word	1073745920
+ 471              		.cfi_endproc
+ 472              	.LFE10:
+ 474              		.section	.text.tim7_isr,"ax",%progbits
+ 475              		.align	1
+ 476              		.global	tim7_isr
+ 477              		.syntax unified
+ 478              		.thumb
+ 479              		.thumb_func
+ 480              		.fpu fpv5-d16
+ 482              	tim7_isr:
+ 483              	.LFB11:
+ 116:Core/Src/i2c_oled.c **** 
+ 117:Core/Src/i2c_oled.c **** void tim7_isr(){
+ 484              		.loc 1 117 0
+ 485              		.cfi_startproc
+ 486              		@ args = 0, pretend = 0, frame = 0
+ 487              		@ frame_needed = 0, uses_anonymous_args = 0
+ 488 0000 08B5     		push	{r3, lr}
+ 489              	.LCFI12:
+ 490              		.cfi_def_cfa_offset 8
+ 491              		.cfi_offset 3, -8
+ 492              		.cfi_offset 14, -4
+ 118:Core/Src/i2c_oled.c **** 	ticks++;
+ 493              		.loc 1 118 0
+ 494 0002 044A     		ldr	r2, .L32
+ 495 0004 1368     		ldr	r3, [r2]
+ 496 0006 0133     		adds	r3, r3, #1
+ 497 0008 1360     		str	r3, [r2]
+ 119:Core/Src/i2c_oled.c **** 	timer_clear_flag(TIM7,TIM_DIER_UIE);
+ 498              		.loc 1 119 0
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 12
+
+
+ 499 000a 0121     		movs	r1, #1
+ 500 000c 0248     		ldr	r0, .L32+4
+ 501 000e FFF7FEFF 		bl	timer_clear_flag
+ 502              	.LVL45:
+ 120:Core/Src/i2c_oled.c **** }
+ 503              		.loc 1 120 0
+ 504 0012 08BD     		pop	{r3, pc}
+ 505              	.L33:
+ 506              		.align	2
+ 507              	.L32:
+ 508 0014 00000000 		.word	.LANCHOR0
+ 509 0018 00140040 		.word	1073746944
+ 510              		.cfi_endproc
+ 511              	.LFE11:
+ 513              		.section	.text.delay_ms,"ax",%progbits
+ 514              		.align	1
+ 515              		.global	delay_ms
+ 516              		.syntax unified
+ 517              		.thumb
+ 518              		.thumb_func
+ 519              		.fpu fpv5-d16
+ 521              	delay_ms:
+ 522              	.LFB12:
+ 121:Core/Src/i2c_oled.c **** 
+ 122:Core/Src/i2c_oled.c **** void delay_ms(uint32_t ms)
+ 123:Core/Src/i2c_oled.c **** {
+ 523              		.loc 1 123 0
+ 524              		.cfi_startproc
+ 525              		@ args = 0, pretend = 0, frame = 0
+ 526              		@ frame_needed = 0, uses_anonymous_args = 0
+ 527              	.LVL46:
+ 528 0000 08B5     		push	{r3, lr}
+ 529              	.LCFI13:
+ 530              		.cfi_def_cfa_offset 8
+ 531              		.cfi_offset 3, -8
+ 532              		.cfi_offset 14, -4
+ 124:Core/Src/i2c_oled.c **** 	TIM_ARR(TIM6) = 2*ms;
+ 533              		.loc 1 124 0
+ 534 0002 4000     		lsls	r0, r0, #1
+ 535              	.LVL47:
+ 536 0004 064B     		ldr	r3, .L37
+ 537 0006 1860     		str	r0, [r3]
+ 125:Core/Src/i2c_oled.c **** 	TIM_EGR(TIM6) = TIM_EGR_UG;
+ 538              		.loc 1 125 0
+ 539 0008 183B     		subs	r3, r3, #24
+ 540 000a 0122     		movs	r2, #1
+ 541 000c 1A60     		str	r2, [r3]
+ 126:Core/Src/i2c_oled.c **** 	timer_enable_counter(TIM6);
+ 542              		.loc 1 126 0
+ 543 000e 0548     		ldr	r0, .L37+4
+ 544 0010 FFF7FEFF 		bl	timer_enable_counter
+ 545              	.LVL48:
+ 546              	.L35:
+ 127:Core/Src/i2c_oled.c **** 	while (TIM_CR1(TIM6) & TIM_CR1_CEN);
+ 547              		.loc 1 127 0 discriminator 1
+ 548 0014 034B     		ldr	r3, .L37+4
+ 549 0016 1B68     		ldr	r3, [r3]
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 13
+
+
+ 550 0018 13F0010F 		tst	r3, #1
+ 551 001c FAD1     		bne	.L35
+ 128:Core/Src/i2c_oled.c **** }
+ 552              		.loc 1 128 0
+ 553 001e 08BD     		pop	{r3, pc}
+ 554              	.L38:
+ 555              		.align	2
+ 556              	.L37:
+ 557 0020 2C100040 		.word	1073745964
+ 558 0024 00100040 		.word	1073745920
+ 559              		.cfi_endproc
+ 560              	.LFE12:
+ 562              		.section	.text.i2c_xfer7,"ax",%progbits
+ 563              		.align	1
+ 564              		.global	i2c_xfer7
+ 565              		.syntax unified
+ 566              		.thumb
+ 567              		.thumb_func
+ 568              		.fpu fpv5-d16
+ 570              	i2c_xfer7:
+ 571              	.LFB13:
+ 129:Core/Src/i2c_oled.c **** 
+ 130:Core/Src/i2c_oled.c **** 
+ 131:Core/Src/i2c_oled.c **** /**
+ 132:Core/Src/i2c_oled.c ****  * Run a write/read transaction to a given 7bit i2c address
+ 133:Core/Src/i2c_oled.c ****  * If both write & read are provided, the read will use repeated start.
+ 134:Core/Src/i2c_oled.c ****  * Both write and read are optional
+ 135:Core/Src/i2c_oled.c ****  * @param i2c peripheral of choice, eg I2C1
+ 136:Core/Src/i2c_oled.c ****  * @param addr 7 bit i2c device address
+ 137:Core/Src/i2c_oled.c ****  * @param w buffer of data to write
+ 138:Core/Src/i2c_oled.c ****  * @param wn length of w
+ 139:Core/Src/i2c_oled.c ****  * @param autoend 
+ 140:Core/Src/i2c_oled.c ****  */
+ 141:Core/Src/i2c_oled.c **** void i2c_xfer7(uint32_t i2c, uint8_t addr, uint8_t command, uint8_t *w, size_t wn, bool autoend)
+ 142:Core/Src/i2c_oled.c **** {	
+ 572              		.loc 1 142 0
+ 573              		.cfi_startproc
+ 574              		@ args = 8, pretend = 0, frame = 0
+ 575              		@ frame_needed = 0, uses_anonymous_args = 0
+ 576              	.LVL49:
+ 577 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 578              	.LCFI14:
+ 579              		.cfi_def_cfa_offset 24
+ 580              		.cfi_offset 4, -24
+ 581              		.cfi_offset 5, -20
+ 582              		.cfi_offset 6, -16
+ 583              		.cfi_offset 7, -12
+ 584              		.cfi_offset 8, -8
+ 585              		.cfi_offset 14, -4
+ 586 0004 0446     		mov	r4, r0
+ 587 0006 1E46     		mov	r6, r3
+ 588 0008 069D     		ldr	r5, [sp, #24]
+ 589 000a 9DF81C70 		ldrb	r7, [sp, #28]	@ zero_extendqisi2
+ 143:Core/Src/i2c_oled.c **** 	i2c_set_7bit_address(i2c, addr);
+ 590              		.loc 1 143 0
+ 591 000e FFF7FEFF 		bl	i2c_set_7bit_address
+ 592              	.LVL50:
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 14
+
+
+ 144:Core/Src/i2c_oled.c **** 	i2c_set_write_transfer_dir(i2c);
+ 593              		.loc 1 144 0
+ 594 0012 2046     		mov	r0, r4
+ 595 0014 FFF7FEFF 		bl	i2c_set_write_transfer_dir
+ 596              	.LVL51:
+ 145:Core/Src/i2c_oled.c **** 	i2c_set_bytes_to_transfer(i2c, wn);
+ 597              		.loc 1 145 0
+ 598 0018 2946     		mov	r1, r5
+ 599 001a 2046     		mov	r0, r4
+ 600 001c FFF7FEFF 		bl	i2c_set_bytes_to_transfer
+ 601              	.LVL52:
+ 146:Core/Src/i2c_oled.c **** 	if (autoend)
+ 602              		.loc 1 146 0
+ 603 0020 37B1     		cbz	r7, .L40
+ 147:Core/Src/i2c_oled.c **** 		i2c_enable_autoend(i2c);
+ 604              		.loc 1 147 0
+ 605 0022 2046     		mov	r0, r4
+ 606 0024 FFF7FEFF 		bl	i2c_enable_autoend
+ 607              	.LVL53:
+ 608              	.L41:
+ 148:Core/Src/i2c_oled.c **** 	else
+ 149:Core/Src/i2c_oled.c **** 		i2c_disable_autoend(i2c);
+ 150:Core/Src/i2c_oled.c **** 
+ 151:Core/Src/i2c_oled.c **** 	i2c_send_start(i2c);
+ 609              		.loc 1 151 0
+ 610 0028 2046     		mov	r0, r4
+ 611 002a FFF7FEFF 		bl	i2c_send_start
+ 612              	.LVL54:
+ 152:Core/Src/i2c_oled.c **** 
+ 153:Core/Src/i2c_oled.c **** 	while (wn--) {
+ 613              		.loc 1 153 0
+ 614 002e 18E0     		b	.L42
+ 615              	.L40:
+ 149:Core/Src/i2c_oled.c **** 
+ 616              		.loc 1 149 0
+ 617 0030 2046     		mov	r0, r4
+ 618 0032 FFF7FEFF 		bl	i2c_disable_autoend
+ 619              	.LVL55:
+ 620 0036 F7E7     		b	.L41
+ 621              	.LVL56:
+ 622              	.L44:
+ 623              	.LBB2:
+ 154:Core/Src/i2c_oled.c **** 		bool wait = true;
+ 155:Core/Src/i2c_oled.c **** 		while (wait) {
+ 156:Core/Src/i2c_oled.c **** 			if (i2c_transmit_int_status(i2c)) {
+ 157:Core/Src/i2c_oled.c **** 				wait = false;
+ 158:Core/Src/i2c_oled.c **** 			}
+ 159:Core/Src/i2c_oled.c **** 			while (i2c_nack(i2c)); /* FIXME Some error */
+ 624              		.loc 1 159 0 discriminator 1
+ 625 0038 2046     		mov	r0, r4
+ 626 003a FFF7FEFF 		bl	i2c_nack
+ 627              	.LVL57:
+ 628 003e 0028     		cmp	r0, #0
+ 629 0040 FAD1     		bne	.L44
+ 630              	.LVL58:
+ 631              	.L46:
+ 155:Core/Src/i2c_oled.c **** 			if (i2c_transmit_int_status(i2c)) {
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 15
+
+
+ 632              		.loc 1 155 0
+ 633 0042 35B1     		cbz	r5, .L50
+ 156:Core/Src/i2c_oled.c **** 				wait = false;
+ 634              		.loc 1 156 0
+ 635 0044 2046     		mov	r0, r4
+ 636 0046 FFF7FEFF 		bl	i2c_transmit_int_status
+ 637              	.LVL59:
+ 638 004a 0028     		cmp	r0, #0
+ 639 004c F4D0     		beq	.L44
+ 157:Core/Src/i2c_oled.c **** 			}
+ 640              		.loc 1 157 0
+ 641 004e 0025     		movs	r5, #0
+ 642              	.LVL60:
+ 643 0050 F2E7     		b	.L44
+ 644              	.LVL61:
+ 645              	.L50:
+ 160:Core/Src/i2c_oled.c **** 		}
+ 161:Core/Src/i2c_oled.c **** 		i2c_send_data(i2c, *w++);
+ 646              		.loc 1 161 0
+ 647 0052 06F10108 		add	r8, r6, #1
+ 648              	.LVL62:
+ 649 0056 3178     		ldrb	r1, [r6]	@ zero_extendqisi2
+ 650 0058 2046     		mov	r0, r4
+ 651 005a FFF7FEFF 		bl	i2c_send_data
+ 652              	.LVL63:
+ 653              	.LBE2:
+ 153:Core/Src/i2c_oled.c **** 		bool wait = true;
+ 654              		.loc 1 153 0
+ 655 005e 3D46     		mov	r5, r7
+ 656              	.LVL64:
+ 657              	.LBB3:
+ 658              		.loc 1 161 0
+ 659 0060 4646     		mov	r6, r8
+ 660              	.LVL65:
+ 661              	.L42:
+ 662              	.LBE3:
+ 153:Core/Src/i2c_oled.c **** 		bool wait = true;
+ 663              		.loc 1 153 0
+ 664 0062 6F1E     		subs	r7, r5, #1
+ 665              	.LVL66:
+ 666 0064 0DB1     		cbz	r5, .L51
+ 667              	.LBB4:
+ 154:Core/Src/i2c_oled.c **** 		while (wait) {
+ 668              		.loc 1 154 0
+ 669 0066 0125     		movs	r5, #1
+ 670 0068 EBE7     		b	.L46
+ 671              	.L51:
+ 672              	.LBE4:
+ 162:Core/Src/i2c_oled.c **** 	}
+ 163:Core/Src/i2c_oled.c **** }
+ 673              		.loc 1 163 0
+ 674 006a BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 675              		.cfi_endproc
+ 676              	.LFE13:
+ 678              		.section	.text.main,"ax",%progbits
+ 679              		.align	1
+ 680              		.global	main
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 16
+
+
+ 681              		.syntax unified
+ 682              		.thumb
+ 683              		.thumb_func
+ 684              		.fpu fpv5-d16
+ 686              	main:
+ 687              	.LFB14:
+ 164:Core/Src/i2c_oled.c **** 
+ 165:Core/Src/i2c_oled.c **** 
+ 166:Core/Src/i2c_oled.c **** int main(){
+ 688              		.loc 1 166 0
+ 689              		.cfi_startproc
+ 690              		@ Volatile: function does not return.
+ 691              		@ args = 0, pretend = 0, frame = 0
+ 692              		@ frame_needed = 0, uses_anonymous_args = 0
+ 693 0000 08B5     		push	{r3, lr}
+ 694              	.LCFI15:
+ 695              		.cfi_def_cfa_offset 8
+ 696              		.cfi_offset 3, -8
+ 697              		.cfi_offset 14, -4
+ 167:Core/Src/i2c_oled.c ****     clock_setup();
+ 698              		.loc 1 167 0
+ 699 0002 FFF7FEFF 		bl	clock_setup
+ 700              	.LVL67:
+ 168:Core/Src/i2c_oled.c **** 	delay_setup();
+ 701              		.loc 1 168 0
+ 702 0006 FFF7FEFF 		bl	delay_setup
+ 703              	.LVL68:
+ 169:Core/Src/i2c_oled.c ****     gpio_setup();
+ 704              		.loc 1 169 0
+ 705 000a FFF7FEFF 		bl	gpio_setup
+ 706              	.LVL69:
+ 170:Core/Src/i2c_oled.c ****     init_usart();
+ 707              		.loc 1 170 0
+ 708 000e FFF7FEFF 		bl	init_usart
+ 709              	.LVL70:
+ 171:Core/Src/i2c_oled.c **** 	i2c1_setup();
+ 710              		.loc 1 171 0
+ 711 0012 FFF7FEFF 		bl	i2c1_setup
+ 712              	.LVL71:
+ 172:Core/Src/i2c_oled.c **** 	uart_printf("testing... \n");
+ 713              		.loc 1 172 0
+ 714 0016 0B48     		ldr	r0, .L55
+ 715 0018 FFF7FEFF 		bl	uart_printf
+ 716              	.LVL72:
+ 717              	.L53:
+ 173:Core/Src/i2c_oled.c **** 	
+ 174:Core/Src/i2c_oled.c **** 	//ssd1306_TestAll();
+ 175:Core/Src/i2c_oled.c **** 	
+ 176:Core/Src/i2c_oled.c ****     for(;;){
+ 177:Core/Src/i2c_oled.c **** 		
+ 178:Core/Src/i2c_oled.c ****   		sprintf((char *)buffer, "Ticks : %lu\n",ticks);
+ 718              		.loc 1 178 0 discriminator 1
+ 719 001c 0A4C     		ldr	r4, .L55+4
+ 720 001e 0B4B     		ldr	r3, .L55+8
+ 721 0020 1A68     		ldr	r2, [r3]
+ 722 0022 0B49     		ldr	r1, .L55+12
+ 723 0024 2046     		mov	r0, r4
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 17
+
+
+ 724 0026 FFF7FEFF 		bl	sprintf
+ 725              	.LVL73:
+ 179:Core/Src/i2c_oled.c **** 		uart_printf(buffer);
+ 726              		.loc 1 179 0 discriminator 1
+ 727 002a 2046     		mov	r0, r4
+ 728 002c FFF7FEFF 		bl	uart_printf
+ 729              	.LVL74:
+ 180:Core/Src/i2c_oled.c ****         gpio_toggle(GPIOB, GPIO0); //blink green led
+ 730              		.loc 1 180 0 discriminator 1
+ 731 0030 0121     		movs	r1, #1
+ 732 0032 0848     		ldr	r0, .L55+16
+ 733 0034 FFF7FEFF 		bl	gpio_toggle
+ 734              	.LVL75:
+ 181:Core/Src/i2c_oled.c **** 		delay_ms(1000);
+ 735              		.loc 1 181 0 discriminator 1
+ 736 0038 4FF47A70 		mov	r0, #1000
+ 737 003c FFF7FEFF 		bl	delay_ms
+ 738              	.LVL76:
+ 739 0040 ECE7     		b	.L53
+ 740              	.L56:
+ 741 0042 00BF     		.align	2
+ 742              	.L55:
+ 743 0044 00000000 		.word	.LC0
+ 744 0048 00000000 		.word	buffer
+ 745 004c 00000000 		.word	.LANCHOR0
+ 746 0050 10000000 		.word	.LC1
+ 747 0054 00040240 		.word	1073873920
+ 748              		.cfi_endproc
+ 749              	.LFE14:
+ 751              		.global	ticks
+ 752              		.comm	buffer,50,4
+ 753              		.section	.bss.ticks,"aw",%nobits
+ 754              		.align	2
+ 755              		.set	.LANCHOR0,. + 0
+ 758              	ticks:
+ 759 0000 00000000 		.space	4
+ 760              		.section	.rodata.main.str1.4,"aMS",%progbits,1
+ 761              		.align	2
+ 762              	.LC0:
+ 763 0000 74657374 		.ascii	"testing... \012\000"
+ 763      696E672E 
+ 763      2E2E200A 
+ 763      00
+ 764 000d 000000   		.space	3
+ 765              	.LC1:
+ 766 0010 5469636B 		.ascii	"Ticks : %lu\012\000"
+ 766      73203A20 
+ 766      256C750A 
+ 766      00
+ 767              		.text
+ 768              	.Letext0:
+ 769              		.file 2 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 770              		.file 3 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 771              		.file 4 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 772              		.file 5 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 773              		.file 6 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 774              		.file 7 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 18
+
+
+ 775              		.file 8 "<built-in>"
+ 776              		.file 9 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 777              		.file 10 "../libopencm3-master/include/libopencm3/stm32/f7/rcc.h"
+ 778              		.file 11 "../libopencm3-master/include/libopencm3/stm32/f7/pwr.h"
+ 779              		.file 12 "../libopencm3-master/include/libopencm3/stm32/common/i2c_common_v2.h"
+ 780              		.file 13 "../SSD1306/ssd1306/ssd1306_fonts.h"
+ 781              		.file 14 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.extern
+ 782              		.file 15 "../libopencm3-master/include/libopencm3/stm32/common/gpio_common_all.h"
+ 783              		.file 16 "../libopencm3-master/include/libopencm3/stm32/common/timer_common_all.h"
+ 784              		.file 17 "../libopencm3-master/include/libopencm3/stm32/common/rcc_common_all.h"
+ 785              		.file 18 "../libopencm3-master/include/libopencm3/cm3/nvic.h"
+ 786              		.file 19 "../libopencm3-master/include/libopencm3/stm32/common/gpio_common_f234.h"
+ 787              		.file 20 "../libopencm3-master/include/libopencm3/stm32/common/usart_common_all.h"
+ 788              		.file 21 "Core/Inc/miniprintf.h"
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 19
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 i2c_oled.c
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:17     .text.gpio_setup:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:23     .text.gpio_setup:0000000000000000 gpio_setup
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:55     .text.gpio_setup:0000000000000020 $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:60     .text.clock_setup:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:66     .text.clock_setup:0000000000000000 clock_setup
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:94     .text.clock_setup:000000000000001c $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:99     .text.i2c1_setup:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:105    .text.i2c1_setup:0000000000000000 i2c1_setup
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:184    .text.i2c1_setup:0000000000000074 $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:191    .text.uart_printf:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:197    .text.uart_printf:0000000000000000 uart_printf
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:246    .text.uart_printf:0000000000000020 $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:257    .text.uart_putc:0000000000000000 uart_putc
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:251    .text.uart_putc:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:280    .text.uart_putc:000000000000000c $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:285    .text._sbrk:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:292    .text._sbrk:0000000000000000 _sbrk
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:308    .text.init_usart:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:315    .text.init_usart:0000000000000000 init_usart
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:391    .text.init_usart:0000000000000074 $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:396    .text.delay_setup:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:403    .text.delay_setup:0000000000000000 delay_setup
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:470    .text.delay_setup:0000000000000060 $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:475    .text.tim7_isr:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:482    .text.tim7_isr:0000000000000000 tim7_isr
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:508    .text.tim7_isr:0000000000000014 $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:514    .text.delay_ms:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:521    .text.delay_ms:0000000000000000 delay_ms
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:557    .text.delay_ms:0000000000000020 $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:563    .text.i2c_xfer7:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:570    .text.i2c_xfer7:0000000000000000 i2c_xfer7
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:679    .text.main:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:686    .text.main:0000000000000000 main
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:743    .text.main:0000000000000044 $d
+                            *COM*:0000000000000032 buffer
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:758    .bss.ticks:0000000000000000 ticks
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:754    .bss.ticks:0000000000000000 $d
+C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s:761    .rodata.main.str1.4:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+gpio_mode_setup
+gpio_set_output_options
+rcc_clock_setup_hsi
+rcc_periph_clock_enable
+rcc_3v3
+i2c_reset
+gpio_set_af
+i2c_peripheral_disable
+i2c_enable_analog_filter
+i2c_set_digital_filter
+rcc_get_spi_clk_freq
+i2c_set_speed
+i2c_peripheral_enable
+mini_vprintf_cooked
+usart_send_blocking
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccXicHZr.s 			page 20
+
+
+usart_set_baudrate
+usart_set_databits
+usart_set_stopbits
+usart_set_mode
+usart_set_parity
+usart_set_flow_control
+usart_enable
+timer_set_prescaler
+timer_set_period
+timer_one_shot_mode
+timer_continuous_mode
+nvic_enable_irq
+timer_enable_irq
+timer_enable_counter
+timer_clear_flag
+i2c_set_7bit_address
+i2c_set_write_transfer_dir
+i2c_set_bytes_to_transfer
+i2c_enable_autoend
+i2c_send_start
+i2c_disable_autoend
+i2c_nack
+i2c_transmit_int_status
+i2c_send_data
+sprintf
+gpio_toggle

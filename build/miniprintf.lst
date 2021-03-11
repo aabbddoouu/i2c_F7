@@ -1,0 +1,1211 @@
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 28, 1
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"miniprintf.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.section	.text.mini_write,"ax",%progbits
+  17              		.align	1
+  18              		.syntax unified
+  19              		.thumb
+  20              		.thumb_func
+  21              		.fpu fpv5-d16
+  23              	mini_write:
+  24              	.LFB0:
+  25              		.file 1 "Core/Src/miniprintf.c"
+   1:Core/Src/miniprintf.c **** /* Minimal printf() facility for MCUs
+   2:Core/Src/miniprintf.c ****  * Warren W. Gay VE3WWG,  Sun Feb 12 2017
+   3:Core/Src/miniprintf.c ****  *
+   4:Core/Src/miniprintf.c ****  * This work is placed in the public domain. No warranty, or guarantee
+   5:Core/Src/miniprintf.c ****  * is expressed or implied. When uou use this source code, you do so
+   6:Core/Src/miniprintf.c ****  * with full responsibility and at your own risk.
+   7:Core/Src/miniprintf.c ****  */
+   8:Core/Src/miniprintf.c **** #include <string.h>
+   9:Core/Src/miniprintf.c **** #include "miniprintf.h"
+  10:Core/Src/miniprintf.c **** 
+  11:Core/Src/miniprintf.c **** /*
+  12:Core/Src/miniprintf.c ****  * Internal structure for I/O
+  13:Core/Src/miniprintf.c ****  */
+  14:Core/Src/miniprintf.c **** struct s_mini_args {
+  15:Core/Src/miniprintf.c **** 	void	(*putc)(char,void *);	// The putc() function to invoke
+  16:Core/Src/miniprintf.c **** 	void 	*argp;			// Associated data struct
+  17:Core/Src/miniprintf.c **** };
+  18:Core/Src/miniprintf.c **** 
+  19:Core/Src/miniprintf.c **** typedef struct s_mini_args miniarg_t;	// Abbreviated ref to s_mini_args
+  20:Core/Src/miniprintf.c **** 
+  21:Core/Src/miniprintf.c **** /*
+  22:Core/Src/miniprintf.c ****  * Internal: Write string msg until null byte, to the I/O
+  23:Core/Src/miniprintf.c ****  *           routine described by s_mini_args.
+  24:Core/Src/miniprintf.c ****  */
+  25:Core/Src/miniprintf.c **** static void
+  26:Core/Src/miniprintf.c **** mini_write(miniarg_t *mini,const char *msg) {
+  26              		.loc 1 26 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 0, uses_anonymous_args = 0
+  30              	.LVL0:
+  31 0000 38B5     		push	{r3, r4, r5, lr}
+  32              	.LCFI0:
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 2
+
+
+  33              		.cfi_def_cfa_offset 16
+  34              		.cfi_offset 3, -16
+  35              		.cfi_offset 4, -12
+  36              		.cfi_offset 5, -8
+  37              		.cfi_offset 14, -4
+  38 0002 0446     		mov	r4, r0
+  27:Core/Src/miniprintf.c **** 	char ch;
+  28:Core/Src/miniprintf.c **** 
+  29:Core/Src/miniprintf.c **** 	while ( (ch = *msg++) != 0 )
+  39              		.loc 1 29 0
+  40 0004 03E0     		b	.L2
+  41              	.LVL1:
+  42              	.L3:
+  30:Core/Src/miniprintf.c **** 		mini->putc(ch,mini->argp);
+  43              		.loc 1 30 0
+  44 0006 2368     		ldr	r3, [r4]
+  45 0008 6168     		ldr	r1, [r4, #4]
+  46 000a 9847     		blx	r3
+  47              	.LVL2:
+  29:Core/Src/miniprintf.c **** 		mini->putc(ch,mini->argp);
+  48              		.loc 1 29 0
+  49 000c 2946     		mov	r1, r5
+  50              	.LVL3:
+  51              	.L2:
+  52 000e 4D1C     		adds	r5, r1, #1
+  53              	.LVL4:
+  54 0010 0878     		ldrb	r0, [r1]	@ zero_extendqisi2
+  55              	.LVL5:
+  56 0012 0028     		cmp	r0, #0
+  57 0014 F7D1     		bne	.L3
+  31:Core/Src/miniprintf.c **** }
+  58              		.loc 1 31 0
+  59 0016 38BD     		pop	{r3, r4, r5, pc}
+  60              		.cfi_endproc
+  61              	.LFE0:
+  63              		.section	.text.mini_putc,"ax",%progbits
+  64              		.align	1
+  65              		.syntax unified
+  66              		.thumb
+  67              		.thumb_func
+  68              		.fpu fpv5-d16
+  70              	mini_putc:
+  71              	.LFB3:
+  32:Core/Src/miniprintf.c **** 
+  33:Core/Src/miniprintf.c **** /*
+  34:Core/Src/miniprintf.c ****  * Internal: Pad % field to width, give text buffer.
+  35:Core/Src/miniprintf.c ****  */
+  36:Core/Src/miniprintf.c **** static void
+  37:Core/Src/miniprintf.c **** mini_pad(miniarg_t *mini,char pad,int width,const char *text) {
+  38:Core/Src/miniprintf.c **** 	int slen;
+  39:Core/Src/miniprintf.c **** 
+  40:Core/Src/miniprintf.c **** 	if ( width > 0 ) {
+  41:Core/Src/miniprintf.c **** 		slen = strlen(text);
+  42:Core/Src/miniprintf.c **** 
+  43:Core/Src/miniprintf.c **** 		for ( width -= slen; width > 0; --width )
+  44:Core/Src/miniprintf.c **** 			mini->putc(pad,mini->argp);
+  45:Core/Src/miniprintf.c **** 	}
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 3
+
+
+  46:Core/Src/miniprintf.c **** }
+  47:Core/Src/miniprintf.c **** 
+  48:Core/Src/miniprintf.c **** /*
+  49:Core/Src/miniprintf.c ****  * Internal: mini_printf() engine.
+  50:Core/Src/miniprintf.c ****  */
+  51:Core/Src/miniprintf.c **** static void
+  52:Core/Src/miniprintf.c **** internal_vprintf(miniarg_t *mini,const char *format,va_list arg) {
+  53:Core/Src/miniprintf.c **** 	char ch, pad, sgn;	/* Current char, pad char and sign char */
+  54:Core/Src/miniprintf.c **** 	int vint, width;	/* Integer value to print and field width */
+  55:Core/Src/miniprintf.c **** 	unsigned uint;		/* Unsigned value to print */
+  56:Core/Src/miniprintf.c **** 	const char *sptr;	/* String to print */
+  57:Core/Src/miniprintf.c **** 	char buf[32], *bptr;	/* Formatting buffer for int/uint */
+  58:Core/Src/miniprintf.c **** 
+  59:Core/Src/miniprintf.c **** 	while ( (ch = *format++) != 0 ) {
+  60:Core/Src/miniprintf.c **** 		if ( ch != '%' ) {
+  61:Core/Src/miniprintf.c **** 			/* Non formatting field: copy as is */
+  62:Core/Src/miniprintf.c **** 			mini->putc(ch,mini->argp);
+  63:Core/Src/miniprintf.c **** 			continue;
+  64:Core/Src/miniprintf.c **** 		}
+  65:Core/Src/miniprintf.c **** 
+  66:Core/Src/miniprintf.c **** 		/*
+  67:Core/Src/miniprintf.c **** 		 * Process a format item:
+  68:Core/Src/miniprintf.c **** 		 */
+  69:Core/Src/miniprintf.c **** 		pad = ' ';	/* Default pad char is space */
+  70:Core/Src/miniprintf.c **** 		sgn = 0;	/* Assume no format sign char */
+  71:Core/Src/miniprintf.c **** 		ch = *format++;	/* Grab next format char */
+  72:Core/Src/miniprintf.c **** 
+  73:Core/Src/miniprintf.c **** 		if ( ch == '+' || ch == '-' ) {
+  74:Core/Src/miniprintf.c **** 			sgn = ch;	/* Make note of format sign */
+  75:Core/Src/miniprintf.c **** 			ch = *format++;	/* Next format char */
+  76:Core/Src/miniprintf.c **** 		}
+  77:Core/Src/miniprintf.c **** 
+  78:Core/Src/miniprintf.c **** 		if ( ch == '0' ) {
+  79:Core/Src/miniprintf.c **** 			pad = ch;	/* Pad with zeros */
+  80:Core/Src/miniprintf.c **** 			ch = *format++;
+  81:Core/Src/miniprintf.c **** 		}
+  82:Core/Src/miniprintf.c **** 
+  83:Core/Src/miniprintf.c **** 		/*
+  84:Core/Src/miniprintf.c **** 		 * Extract width when present:
+  85:Core/Src/miniprintf.c **** 		 */
+  86:Core/Src/miniprintf.c **** 		for ( width = 0; ch && ch >= '0' && ch <= '9'; ch = *format++ )
+  87:Core/Src/miniprintf.c **** 			width = width * 10 + (ch & 0x0F);
+  88:Core/Src/miniprintf.c **** 
+  89:Core/Src/miniprintf.c **** 		if ( !ch )
+  90:Core/Src/miniprintf.c **** 			break;		/* Exit loop if we hit end of format string (in error) */
+  91:Core/Src/miniprintf.c **** 
+  92:Core/Src/miniprintf.c **** 		/*
+  93:Core/Src/miniprintf.c **** 		 * Format according to type: d, x, or s
+  94:Core/Src/miniprintf.c **** 		 */
+  95:Core/Src/miniprintf.c **** 		switch ( ch ) {
+  96:Core/Src/miniprintf.c **** 		case 'c':
+  97:Core/Src/miniprintf.c **** 			vint = va_arg(arg,int);
+  98:Core/Src/miniprintf.c **** 			mini->putc((char)vint,mini->argp);
+  99:Core/Src/miniprintf.c **** 			break;
+ 100:Core/Src/miniprintf.c **** 		case 'd':		/* Decimal format */
+ 101:Core/Src/miniprintf.c **** 			vint = va_arg(arg,int);
+ 102:Core/Src/miniprintf.c **** 			if ( vint < 0 ) {
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 4
+
+
+ 103:Core/Src/miniprintf.c **** 				mini->putc('-',mini->argp);
+ 104:Core/Src/miniprintf.c **** 				vint = -vint;
+ 105:Core/Src/miniprintf.c **** 			} else if ( sgn == '+' )
+ 106:Core/Src/miniprintf.c **** 				mini->putc(sgn,mini->argp);
+ 107:Core/Src/miniprintf.c **** 			bptr = buf + sizeof buf;
+ 108:Core/Src/miniprintf.c **** 			*--bptr = 0;
+ 109:Core/Src/miniprintf.c **** 			do	{
+ 110:Core/Src/miniprintf.c **** 				*--bptr = vint % 10 + '0';
+ 111:Core/Src/miniprintf.c **** 				vint /= 10;
+ 112:Core/Src/miniprintf.c **** 			} while ( vint != 0 );
+ 113:Core/Src/miniprintf.c **** 			mini_pad(mini,pad,width,bptr);
+ 114:Core/Src/miniprintf.c **** 			mini_write(mini,bptr);
+ 115:Core/Src/miniprintf.c **** 			break;
+ 116:Core/Src/miniprintf.c **** 
+ 117:Core/Src/miniprintf.c **** 		case 'x':		/* Hexadecimal format */
+ 118:Core/Src/miniprintf.c **** 			uint = va_arg(arg,unsigned);
+ 119:Core/Src/miniprintf.c **** 			bptr = buf + sizeof buf;
+ 120:Core/Src/miniprintf.c **** 			*--bptr = 0;
+ 121:Core/Src/miniprintf.c **** 			do	{
+ 122:Core/Src/miniprintf.c **** 				ch = uint & 0x0F;
+ 123:Core/Src/miniprintf.c **** 				*--bptr = ch + (ch <= 9 ? '0' : 'A'-10);
+ 124:Core/Src/miniprintf.c **** 				uint >>= 4;
+ 125:Core/Src/miniprintf.c **** 			} while ( uint != 0 );
+ 126:Core/Src/miniprintf.c **** 			mini_pad(mini,pad,width,bptr);
+ 127:Core/Src/miniprintf.c **** 			mini_write(mini,bptr);
+ 128:Core/Src/miniprintf.c **** 			break;
+ 129:Core/Src/miniprintf.c **** 
+ 130:Core/Src/miniprintf.c **** 		case 's':		/* String format */
+ 131:Core/Src/miniprintf.c **** 			sptr = va_arg(arg,const char *);
+ 132:Core/Src/miniprintf.c **** 			if ( sgn != '-' )
+ 133:Core/Src/miniprintf.c **** 				mini_pad(mini,pad,width,sptr);
+ 134:Core/Src/miniprintf.c **** 			mini_write(mini,sptr);
+ 135:Core/Src/miniprintf.c **** 			if ( sgn == '-' )
+ 136:Core/Src/miniprintf.c **** 				mini_pad(mini,pad,width,sptr);
+ 137:Core/Src/miniprintf.c **** 			break;
+ 138:Core/Src/miniprintf.c **** 
+ 139:Core/Src/miniprintf.c **** 		case '%':		/* "%%" outputs as "%" */
+ 140:Core/Src/miniprintf.c **** 			mini->putc(ch,mini->argp);
+ 141:Core/Src/miniprintf.c **** 			break;
+ 142:Core/Src/miniprintf.c **** 
+ 143:Core/Src/miniprintf.c **** 		default:		/* Unsupported stuff here */
+ 144:Core/Src/miniprintf.c **** 			mini->putc('%',mini->argp);
+ 145:Core/Src/miniprintf.c **** 			mini->putc('?',mini->argp);
+ 146:Core/Src/miniprintf.c **** 			mini->putc(ch,mini->argp);
+ 147:Core/Src/miniprintf.c **** 		}
+ 148:Core/Src/miniprintf.c **** 	}
+ 149:Core/Src/miniprintf.c **** }
+ 150:Core/Src/miniprintf.c **** 
+ 151:Core/Src/miniprintf.c **** /*
+ 152:Core/Src/miniprintf.c ****  * s_internal trackes the count of bytes output:
+ 153:Core/Src/miniprintf.c ****  */
+ 154:Core/Src/miniprintf.c **** struct s_internal {
+ 155:Core/Src/miniprintf.c **** 	void (*putc)(char);	/* User's putc() routine to be used */
+ 156:Core/Src/miniprintf.c **** 	unsigned count;		/* Bytes output */
+ 157:Core/Src/miniprintf.c **** 	unsigned cooked : 1;	/* When true, '\n' also emits '\r' */
+ 158:Core/Src/miniprintf.c **** };
+ 159:Core/Src/miniprintf.c **** 
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 5
+
+
+ 160:Core/Src/miniprintf.c **** static void
+ 161:Core/Src/miniprintf.c **** mini_putc(char ch,void *argp) {
+  72              		.loc 1 161 0
+  73              		.cfi_startproc
+  74              		@ args = 0, pretend = 0, frame = 0
+  75              		@ frame_needed = 0, uses_anonymous_args = 0
+  76              	.LVL6:
+  77 0000 38B5     		push	{r3, r4, r5, lr}
+  78              	.LCFI1:
+  79              		.cfi_def_cfa_offset 16
+  80              		.cfi_offset 3, -16
+  81              		.cfi_offset 4, -12
+  82              		.cfi_offset 5, -8
+  83              		.cfi_offset 14, -4
+  84 0002 0546     		mov	r5, r0
+  85 0004 0C46     		mov	r4, r1
+  86              	.LVL7:
+ 162:Core/Src/miniprintf.c **** 	struct s_internal *internp = (struct s_internal *)argp;
+ 163:Core/Src/miniprintf.c **** 
+ 164:Core/Src/miniprintf.c **** 	internp->putc(ch);	/* Perform I/O */
+  87              		.loc 1 164 0
+  88 0006 0B68     		ldr	r3, [r1]
+  89 0008 9847     		blx	r3
+  90              	.LVL8:
+ 165:Core/Src/miniprintf.c **** 	++internp->count;	/* Count bytes out */
+  91              		.loc 1 165 0
+  92 000a 6368     		ldr	r3, [r4, #4]
+  93 000c 0133     		adds	r3, r3, #1
+  94 000e 6360     		str	r3, [r4, #4]
+ 166:Core/Src/miniprintf.c **** 
+ 167:Core/Src/miniprintf.c **** 	if ( ch == '\n' && internp->cooked != 0 ) {
+  95              		.loc 1 167 0
+  96 0010 0A2D     		cmp	r5, #10
+  97 0012 00D0     		beq	.L8
+  98              	.L5:
+ 168:Core/Src/miniprintf.c **** 		/* In cooked mode, issue CR after LF */
+ 169:Core/Src/miniprintf.c **** 		internp->putc('\r');
+ 170:Core/Src/miniprintf.c **** 		++internp->count;	/* Count CR */
+ 171:Core/Src/miniprintf.c **** 	}
+ 172:Core/Src/miniprintf.c **** }
+  99              		.loc 1 172 0
+ 100 0014 38BD     		pop	{r3, r4, r5, pc}
+ 101              	.LVL9:
+ 102              	.L8:
+ 167:Core/Src/miniprintf.c **** 		/* In cooked mode, issue CR after LF */
+ 103              		.loc 1 167 0 discriminator 1
+ 104 0016 237A     		ldrb	r3, [r4, #8]	@ zero_extendqisi2
+ 105 0018 13F0010F 		tst	r3, #1
+ 106 001c FAD0     		beq	.L5
+ 169:Core/Src/miniprintf.c **** 		++internp->count;	/* Count CR */
+ 107              		.loc 1 169 0
+ 108 001e 2368     		ldr	r3, [r4]
+ 109 0020 0D20     		movs	r0, #13
+ 110 0022 9847     		blx	r3
+ 111              	.LVL10:
+ 170:Core/Src/miniprintf.c **** 	}
+ 112              		.loc 1 170 0
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 6
+
+
+ 113 0024 6368     		ldr	r3, [r4, #4]
+ 114 0026 0133     		adds	r3, r3, #1
+ 115 0028 6360     		str	r3, [r4, #4]
+ 116              		.loc 1 172 0
+ 117 002a F3E7     		b	.L5
+ 118              		.cfi_endproc
+ 119              	.LFE3:
+ 121              		.section	.text.mini_sputc,"ax",%progbits
+ 122              		.align	1
+ 123              		.syntax unified
+ 124              		.thumb
+ 125              		.thumb_func
+ 126              		.fpu fpv5-d16
+ 128              	mini_sputc:
+ 129              	.LFB7:
+ 173:Core/Src/miniprintf.c **** 
+ 174:Core/Src/miniprintf.c **** /*
+ 175:Core/Src/miniprintf.c ****  * Internal: Perform cooked/uncooked printf()
+ 176:Core/Src/miniprintf.c ****  */
+ 177:Core/Src/miniprintf.c **** static int
+ 178:Core/Src/miniprintf.c **** mini_vprintf0(void (*putc)(char),int cooked,const char *format,va_list args) {
+ 179:Core/Src/miniprintf.c **** 	miniarg_t mini;
+ 180:Core/Src/miniprintf.c **** 	struct s_internal intern;
+ 181:Core/Src/miniprintf.c **** 
+ 182:Core/Src/miniprintf.c **** 	intern.putc = putc;		/* User's putc() routine to be used */
+ 183:Core/Src/miniprintf.c **** 	intern.count = 0u;		/* Byte counter */
+ 184:Core/Src/miniprintf.c **** 	intern.cooked = !!cooked; 	/* True if LF to add CR */
+ 185:Core/Src/miniprintf.c **** 
+ 186:Core/Src/miniprintf.c **** 	mini.putc = mini_putc;		/* Internal interlude routine */
+ 187:Core/Src/miniprintf.c **** 	mini.argp = (void *)&intern; 	/* Ptr to internal struct */
+ 188:Core/Src/miniprintf.c **** 
+ 189:Core/Src/miniprintf.c **** 	internal_vprintf(&mini,format,args);
+ 190:Core/Src/miniprintf.c **** 	return intern.count;		/* Return byte count */
+ 191:Core/Src/miniprintf.c **** }
+ 192:Core/Src/miniprintf.c **** 
+ 193:Core/Src/miniprintf.c **** /*
+ 194:Core/Src/miniprintf.c ****  * External: Perform cooked mode printf()
+ 195:Core/Src/miniprintf.c ****  */
+ 196:Core/Src/miniprintf.c **** int
+ 197:Core/Src/miniprintf.c **** mini_vprintf_cooked(void (*putc)(char),const char *format,va_list args) {
+ 198:Core/Src/miniprintf.c **** 	return mini_vprintf0(putc,1,format,args);
+ 199:Core/Src/miniprintf.c **** }
+ 200:Core/Src/miniprintf.c **** 
+ 201:Core/Src/miniprintf.c **** /*
+ 202:Core/Src/miniprintf.c ****  * External: Perform uncooked (as is) printf()
+ 203:Core/Src/miniprintf.c ****  */
+ 204:Core/Src/miniprintf.c **** int
+ 205:Core/Src/miniprintf.c **** mini_vprintf_uncooked(void (*putc)(char),const char *format,va_list args) {
+ 206:Core/Src/miniprintf.c **** 	return mini_vprintf0(putc,0,format,args);
+ 207:Core/Src/miniprintf.c **** }
+ 208:Core/Src/miniprintf.c **** 
+ 209:Core/Src/miniprintf.c **** /*********************************************************************
+ 210:Core/Src/miniprintf.c ****  * Sprintf
+ 211:Core/Src/miniprintf.c ****  *********************************************************************/
+ 212:Core/Src/miniprintf.c **** 
+ 213:Core/Src/miniprintf.c **** struct s_mini_sprintf {
+ 214:Core/Src/miniprintf.c **** 	char	*buf;			/* Ptr to output buffer */
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 7
+
+
+ 215:Core/Src/miniprintf.c **** 	unsigned maxbuf;		/* Max bytes for buffer */
+ 216:Core/Src/miniprintf.c **** 	char	*ptr;			/* Ptr to next byte */
+ 217:Core/Src/miniprintf.c **** };
+ 218:Core/Src/miniprintf.c **** 
+ 219:Core/Src/miniprintf.c **** static void
+ 220:Core/Src/miniprintf.c **** mini_sputc(char ch,void *argp) {
+ 130              		.loc 1 220 0
+ 131              		.cfi_startproc
+ 132              		@ args = 0, pretend = 0, frame = 0
+ 133              		@ frame_needed = 0, uses_anonymous_args = 0
+ 134              		@ link register save eliminated.
+ 135              	.LVL11:
+ 136 0000 10B4     		push	{r4}
+ 137              	.LCFI2:
+ 138              		.cfi_def_cfa_offset 4
+ 139              		.cfi_offset 4, -4
+ 140              	.LVL12:
+ 221:Core/Src/miniprintf.c **** 	struct s_mini_sprintf *ctl = (struct s_mini_sprintf *)argp;
+ 222:Core/Src/miniprintf.c **** 
+ 223:Core/Src/miniprintf.c **** 	if ( (unsigned)(ctl->ptr - ctl->buf) >= ctl->maxbuf )
+ 141              		.loc 1 223 0
+ 142 0002 8A68     		ldr	r2, [r1, #8]
+ 143 0004 0B68     		ldr	r3, [r1]
+ 144 0006 D31A     		subs	r3, r2, r3
+ 145 0008 4C68     		ldr	r4, [r1, #4]
+ 146 000a A342     		cmp	r3, r4
+ 147 000c 02D2     		bcs	.L9
+ 224:Core/Src/miniprintf.c **** 		return;
+ 225:Core/Src/miniprintf.c **** 	*ctl->ptr++ = ch;
+ 148              		.loc 1 225 0
+ 149 000e 531C     		adds	r3, r2, #1
+ 150 0010 8B60     		str	r3, [r1, #8]
+ 151 0012 1070     		strb	r0, [r2]
+ 152              	.L9:
+ 226:Core/Src/miniprintf.c **** }
+ 153              		.loc 1 226 0
+ 154 0014 5DF8044B 		ldr	r4, [sp], #4
+ 155              	.LCFI3:
+ 156              		.cfi_restore 4
+ 157              		.cfi_def_cfa_offset 0
+ 158 0018 7047     		bx	lr
+ 159              		.cfi_endproc
+ 160              	.LFE7:
+ 162              		.section	.text.mini_pad,"ax",%progbits
+ 163              		.align	1
+ 164              		.syntax unified
+ 165              		.thumb
+ 166              		.thumb_func
+ 167              		.fpu fpv5-d16
+ 169              	mini_pad:
+ 170              	.LFB1:
+  37:Core/Src/miniprintf.c **** 	int slen;
+ 171              		.loc 1 37 0
+ 172              		.cfi_startproc
+ 173              		@ args = 0, pretend = 0, frame = 0
+ 174              		@ frame_needed = 0, uses_anonymous_args = 0
+ 175              	.LVL13:
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 8
+
+
+ 176 0000 70B5     		push	{r4, r5, r6, lr}
+ 177              	.LCFI4:
+ 178              		.cfi_def_cfa_offset 16
+ 179              		.cfi_offset 4, -16
+ 180              		.cfi_offset 5, -12
+ 181              		.cfi_offset 6, -8
+ 182              		.cfi_offset 14, -4
+  40:Core/Src/miniprintf.c **** 		slen = strlen(text);
+ 183              		.loc 1 40 0
+ 184 0002 141E     		subs	r4, r2, #0
+ 185 0004 0DDD     		ble	.L12
+ 186 0006 0546     		mov	r5, r0
+ 187 0008 1846     		mov	r0, r3
+ 188              	.LVL14:
+ 189 000a 0E46     		mov	r6, r1
+  41:Core/Src/miniprintf.c **** 
+ 190              		.loc 1 41 0
+ 191 000c FFF7FEFF 		bl	strlen
+ 192              	.LVL15:
+  43:Core/Src/miniprintf.c **** 			mini->putc(pad,mini->argp);
+ 193              		.loc 1 43 0
+ 194 0010 241A     		subs	r4, r4, r0
+ 195              	.LVL16:
+ 196 0012 04E0     		b	.L14
+ 197              	.LVL17:
+ 198              	.L15:
+  44:Core/Src/miniprintf.c **** 	}
+ 199              		.loc 1 44 0 discriminator 3
+ 200 0014 2B68     		ldr	r3, [r5]
+ 201 0016 6968     		ldr	r1, [r5, #4]
+ 202 0018 3046     		mov	r0, r6
+ 203 001a 9847     		blx	r3
+ 204              	.LVL18:
+  43:Core/Src/miniprintf.c **** 			mini->putc(pad,mini->argp);
+ 205              		.loc 1 43 0 discriminator 3
+ 206 001c 013C     		subs	r4, r4, #1
+ 207              	.LVL19:
+ 208              	.L14:
+  43:Core/Src/miniprintf.c **** 			mini->putc(pad,mini->argp);
+ 209              		.loc 1 43 0 is_stmt 0 discriminator 1
+ 210 001e 002C     		cmp	r4, #0
+ 211 0020 F8DC     		bgt	.L15
+ 212              	.LVL20:
+ 213              	.L12:
+  46:Core/Src/miniprintf.c **** 
+ 214              		.loc 1 46 0 is_stmt 1
+ 215 0022 70BD     		pop	{r4, r5, r6, pc}
+ 216              		.cfi_endproc
+ 217              	.LFE1:
+ 219              		.section	.text.internal_vprintf,"ax",%progbits
+ 220              		.align	1
+ 221              		.syntax unified
+ 222              		.thumb
+ 223              		.thumb_func
+ 224              		.fpu fpv5-d16
+ 226              	internal_vprintf:
+ 227              	.LFB2:
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 9
+
+
+  52:Core/Src/miniprintf.c **** 	char ch, pad, sgn;	/* Current char, pad char and sign char */
+ 228              		.loc 1 52 0
+ 229              		.cfi_startproc
+ 230              		@ args = 0, pretend = 0, frame = 40
+ 231              		@ frame_needed = 0, uses_anonymous_args = 0
+ 232              	.LVL21:
+ 233 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 234              	.LCFI5:
+ 235              		.cfi_def_cfa_offset 28
+ 236              		.cfi_offset 4, -28
+ 237              		.cfi_offset 5, -24
+ 238              		.cfi_offset 6, -20
+ 239              		.cfi_offset 7, -16
+ 240              		.cfi_offset 8, -12
+ 241              		.cfi_offset 9, -8
+ 242              		.cfi_offset 14, -4
+ 243 0004 8BB0     		sub	sp, sp, #44
+ 244              	.LCFI6:
+ 245              		.cfi_def_cfa_offset 72
+ 246 0006 0746     		mov	r7, r0
+ 247 0008 0C46     		mov	r4, r1
+ 248 000a 0192     		str	r2, [sp, #4]
+ 249              	.LVL22:
+ 250              	.L18:
+  59:Core/Src/miniprintf.c **** 		if ( ch != '%' ) {
+ 251              		.loc 1 59 0
+ 252 000c 651C     		adds	r5, r4, #1
+ 253              	.LVL23:
+ 254 000e 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 255              	.LVL24:
+ 256 0010 0028     		cmp	r0, #0
+ 257 0012 00F0C580 		beq	.L17
+  60:Core/Src/miniprintf.c **** 			/* Non formatting field: copy as is */
+ 258              		.loc 1 60 0
+ 259 0016 2528     		cmp	r0, #37
+ 260 0018 04D0     		beq	.L19
+  62:Core/Src/miniprintf.c **** 			continue;
+ 261              		.loc 1 62 0
+ 262 001a 3B68     		ldr	r3, [r7]
+ 263 001c 7968     		ldr	r1, [r7, #4]
+ 264 001e 9847     		blx	r3
+ 265              	.LVL25:
+  59:Core/Src/miniprintf.c **** 		if ( ch != '%' ) {
+ 266              		.loc 1 59 0
+ 267 0020 2C46     		mov	r4, r5
+  63:Core/Src/miniprintf.c **** 		}
+ 268              		.loc 1 63 0
+ 269 0022 F3E7     		b	.L18
+ 270              	.LVL26:
+ 271              	.L19:
+  71:Core/Src/miniprintf.c **** 
+ 272              		.loc 1 71 0
+ 273 0024 A31C     		adds	r3, r4, #2
+ 274              	.LVL27:
+ 275 0026 6678     		ldrb	r6, [r4, #1]	@ zero_extendqisi2
+ 276              	.LVL28:
+  73:Core/Src/miniprintf.c **** 			sgn = ch;	/* Make note of format sign */
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 10
+
+
+ 277              		.loc 1 73 0
+ 278 0028 2D2E     		cmp	r6, #45
+ 279 002a 18BF     		it	ne
+ 280 002c 2B2E     		cmpne	r6, #43
+ 281 002e 09D1     		bne	.L40
+ 282              	.LVL29:
+  75:Core/Src/miniprintf.c **** 		}
+ 283              		.loc 1 75 0
+ 284 0030 E31C     		adds	r3, r4, #3
+ 285              	.LVL30:
+  74:Core/Src/miniprintf.c **** 			ch = *format++;	/* Next format char */
+ 286              		.loc 1 74 0
+ 287 0032 B146     		mov	r9, r6
+  75:Core/Src/miniprintf.c **** 		}
+ 288              		.loc 1 75 0
+ 289 0034 A678     		ldrb	r6, [r4, #2]	@ zero_extendqisi2
+ 290              	.LVL31:
+ 291              	.L21:
+  78:Core/Src/miniprintf.c **** 			pad = ch;	/* Pad with zeros */
+ 292              		.loc 1 78 0
+ 293 0036 302E     		cmp	r6, #48
+ 294 0038 07D0     		beq	.L44
+  69:Core/Src/miniprintf.c **** 		sgn = 0;	/* Assume no format sign char */
+ 295              		.loc 1 69 0
+ 296 003a 4FF02008 		mov	r8, #32
+ 297              	.LVL32:
+ 298              	.L22:
+  86:Core/Src/miniprintf.c **** 			width = width * 10 + (ch & 0x0F);
+ 299              		.loc 1 86 0
+ 300 003e 1C46     		mov	r4, r3
+ 301 0040 0025     		movs	r5, #0
+ 302 0042 0EE0     		b	.L23
+ 303              	.LVL33:
+ 304              	.L40:
+  70:Core/Src/miniprintf.c **** 		ch = *format++;	/* Grab next format char */
+ 305              		.loc 1 70 0
+ 306 0044 4FF00009 		mov	r9, #0
+ 307 0048 F5E7     		b	.L21
+ 308              	.LVL34:
+ 309              	.L44:
+  79:Core/Src/miniprintf.c **** 			ch = *format++;
+ 310              		.loc 1 79 0
+ 311 004a B046     		mov	r8, r6
+  80:Core/Src/miniprintf.c **** 		}
+ 312              		.loc 1 80 0
+ 313 004c 1E78     		ldrb	r6, [r3]	@ zero_extendqisi2
+ 314              	.LVL35:
+ 315 004e 0133     		adds	r3, r3, #1
+ 316              	.LVL36:
+ 317 0050 F5E7     		b	.L22
+ 318              	.LVL37:
+ 319              	.L24:
+  87:Core/Src/miniprintf.c **** 
+ 320              		.loc 1 87 0 discriminator 3
+ 321 0052 05EB8505 		add	r5, r5, r5, lsl #2
+ 322              	.LVL38:
+ 323 0056 6B00     		lsls	r3, r5, #1
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 11
+
+
+ 324 0058 06F00F05 		and	r5, r6, #15
+ 325 005c 1D44     		add	r5, r5, r3
+ 326              	.LVL39:
+  86:Core/Src/miniprintf.c **** 			width = width * 10 + (ch & 0x0F);
+ 327              		.loc 1 86 0 discriminator 3
+ 328 005e 2678     		ldrb	r6, [r4]	@ zero_extendqisi2
+ 329              	.LVL40:
+ 330 0060 0134     		adds	r4, r4, #1
+ 331              	.LVL41:
+ 332              	.L23:
+  86:Core/Src/miniprintf.c **** 			width = width * 10 + (ch & 0x0F);
+ 333              		.loc 1 86 0 is_stmt 0 discriminator 1
+ 334 0062 A6F13003 		sub	r3, r6, #48
+ 335 0066 DBB2     		uxtb	r3, r3
+ 336 0068 092B     		cmp	r3, #9
+ 337 006a F2D9     		bls	.L24
+  89:Core/Src/miniprintf.c **** 			break;		/* Exit loop if we hit end of format string (in error) */
+ 338              		.loc 1 89 0 is_stmt 1
+ 339 006c 002E     		cmp	r6, #0
+ 340 006e 00F09780 		beq	.L17
+  95:Core/Src/miniprintf.c **** 		case 'c':
+ 341              		.loc 1 95 0
+ 342 0072 642E     		cmp	r6, #100
+ 343 0074 1AD0     		beq	.L27
+ 344 0076 0CD8     		bhi	.L28
+ 345 0078 252E     		cmp	r6, #37
+ 346 007a 7FD0     		beq	.L29
+ 347 007c 632E     		cmp	r6, #99
+ 348 007e 40F08280 		bne	.L26
+  97:Core/Src/miniprintf.c **** 			mini->putc((char)vint,mini->argp);
+ 349              		.loc 1 97 0
+ 350 0082 019B     		ldr	r3, [sp, #4]
+ 351 0084 1A1D     		adds	r2, r3, #4
+ 352 0086 0192     		str	r2, [sp, #4]
+  98:Core/Src/miniprintf.c **** 			break;
+ 353              		.loc 1 98 0
+ 354 0088 3A68     		ldr	r2, [r7]
+ 355 008a 7968     		ldr	r1, [r7, #4]
+ 356 008c 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 357 008e 9047     		blx	r2
+ 358              	.LVL42:
+  99:Core/Src/miniprintf.c **** 		case 'd':		/* Decimal format */
+ 359              		.loc 1 99 0
+ 360 0090 BCE7     		b	.L18
+ 361              	.L28:
+  95:Core/Src/miniprintf.c **** 		case 'c':
+ 362              		.loc 1 95 0
+ 363 0092 732E     		cmp	r6, #115
+ 364 0094 55D0     		beq	.L31
+ 365 0096 782E     		cmp	r6, #120
+ 366 0098 75D1     		bne	.L26
+ 118:Core/Src/miniprintf.c **** 			bptr = buf + sizeof buf;
+ 367              		.loc 1 118 0
+ 368 009a 019B     		ldr	r3, [sp, #4]
+ 369 009c 1A1D     		adds	r2, r3, #4
+ 370 009e 0192     		str	r2, [sp, #4]
+ 371 00a0 1B68     		ldr	r3, [r3]
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 12
+
+
+ 372              	.LVL43:
+ 120:Core/Src/miniprintf.c **** 			do	{
+ 373              		.loc 1 120 0
+ 374 00a2 0AAE     		add	r6, sp, #40
+ 375              	.LVL44:
+ 376 00a4 0022     		movs	r2, #0
+ 377 00a6 06F8012D 		strb	r2, [r6, #-1]!
+ 378 00aa 39E0     		b	.L37
+ 379              	.LVL45:
+ 380              	.L27:
+ 101:Core/Src/miniprintf.c **** 			if ( vint < 0 ) {
+ 381              		.loc 1 101 0
+ 382 00ac 019B     		ldr	r3, [sp, #4]
+ 383 00ae 1A1D     		adds	r2, r3, #4
+ 384 00b0 0192     		str	r2, [sp, #4]
+ 385 00b2 1E68     		ldr	r6, [r3]
+ 386              	.LVL46:
+ 102:Core/Src/miniprintf.c **** 				mini->putc('-',mini->argp);
+ 387              		.loc 1 102 0
+ 388 00b4 002E     		cmp	r6, #0
+ 389 00b6 25DA     		bge	.L33
+ 103:Core/Src/miniprintf.c **** 				vint = -vint;
+ 390              		.loc 1 103 0
+ 391 00b8 3B68     		ldr	r3, [r7]
+ 392 00ba 7968     		ldr	r1, [r7, #4]
+ 393 00bc 2D20     		movs	r0, #45
+ 394 00be 9847     		blx	r3
+ 395              	.LVL47:
+ 104:Core/Src/miniprintf.c **** 			} else if ( sgn == '+' )
+ 396              		.loc 1 104 0
+ 397 00c0 7642     		negs	r6, r6
+ 398              	.LVL48:
+ 399              	.L34:
+ 108:Core/Src/miniprintf.c **** 			do	{
+ 400              		.loc 1 108 0
+ 401 00c2 0DF12809 		add	r9, sp, #40
+ 402              	.LVL49:
+ 403 00c6 0023     		movs	r3, #0
+ 404 00c8 09F8013D 		strb	r3, [r9, #-1]!
+ 405              	.LVL50:
+ 406              	.L35:
+ 110:Core/Src/miniprintf.c **** 				vint /= 10;
+ 407              		.loc 1 110 0 discriminator 1
+ 408 00cc 364A     		ldr	r2, .L47
+ 409 00ce 82FB0632 		smull	r3, r2, r2, r6
+ 410 00d2 F317     		asrs	r3, r6, #31
+ 411 00d4 C3EBA203 		rsb	r3, r3, r2, asr #2
+ 412 00d8 1A46     		mov	r2, r3
+ 413 00da 03EB8303 		add	r3, r3, r3, lsl #2
+ 414 00de 5900     		lsls	r1, r3, #1
+ 415 00e0 731A     		subs	r3, r6, r1
+ 416 00e2 3033     		adds	r3, r3, #48
+ 417 00e4 09F8013D 		strb	r3, [r9, #-1]!
+ 418              	.LVL51:
+ 111:Core/Src/miniprintf.c **** 			} while ( vint != 0 );
+ 419              		.loc 1 111 0 discriminator 1
+ 420 00e8 1646     		mov	r6, r2
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 13
+
+
+ 421              	.LVL52:
+ 112:Core/Src/miniprintf.c **** 			mini_pad(mini,pad,width,bptr);
+ 422              		.loc 1 112 0 discriminator 1
+ 423 00ea 002A     		cmp	r2, #0
+ 424 00ec EED1     		bne	.L35
+ 113:Core/Src/miniprintf.c **** 			mini_write(mini,bptr);
+ 425              		.loc 1 113 0
+ 426 00ee 4B46     		mov	r3, r9
+ 427 00f0 2A46     		mov	r2, r5
+ 428              	.LVL53:
+ 429 00f2 4146     		mov	r1, r8
+ 430 00f4 3846     		mov	r0, r7
+ 431 00f6 FFF7FEFF 		bl	mini_pad
+ 432              	.LVL54:
+ 114:Core/Src/miniprintf.c **** 			break;
+ 433              		.loc 1 114 0
+ 434 00fa 4946     		mov	r1, r9
+ 435 00fc 3846     		mov	r0, r7
+ 436 00fe FFF7FEFF 		bl	mini_write
+ 437              	.LVL55:
+ 115:Core/Src/miniprintf.c **** 
+ 438              		.loc 1 115 0
+ 439 0102 83E7     		b	.L18
+ 440              	.LVL56:
+ 441              	.L33:
+ 105:Core/Src/miniprintf.c **** 				mini->putc(sgn,mini->argp);
+ 442              		.loc 1 105 0
+ 443 0104 B9F12B0F 		cmp	r9, #43
+ 444 0108 DBD1     		bne	.L34
+ 106:Core/Src/miniprintf.c **** 			bptr = buf + sizeof buf;
+ 445              		.loc 1 106 0
+ 446 010a 3B68     		ldr	r3, [r7]
+ 447 010c 7968     		ldr	r1, [r7, #4]
+ 448 010e 4846     		mov	r0, r9
+ 449 0110 9847     		blx	r3
+ 450              	.LVL57:
+ 451 0112 D6E7     		b	.L34
+ 452              	.LVL58:
+ 453              	.L42:
+ 123:Core/Src/miniprintf.c **** 				uint >>= 4;
+ 454              		.loc 1 123 0
+ 455 0114 3722     		movs	r2, #55
+ 456              	.L36:
+ 123:Core/Src/miniprintf.c **** 				uint >>= 4;
+ 457              		.loc 1 123 0 is_stmt 0 discriminator 4
+ 458 0116 0A44     		add	r2, r2, r1
+ 459 0118 06F8012D 		strb	r2, [r6, #-1]!
+ 460              	.LVL59:
+ 125:Core/Src/miniprintf.c **** 			mini_pad(mini,pad,width,bptr);
+ 461              		.loc 1 125 0 is_stmt 1 discriminator 4
+ 462 011c 1B09     		lsrs	r3, r3, #4
+ 463              	.LVL60:
+ 464 011e 05D0     		beq	.L45
+ 465              	.LVL61:
+ 466              	.L37:
+ 122:Core/Src/miniprintf.c **** 				*--bptr = ch + (ch <= 9 ? '0' : 'A'-10);
+ 467              		.loc 1 122 0
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 14
+
+
+ 468 0120 03F00F01 		and	r1, r3, #15
+ 469              	.LVL62:
+ 123:Core/Src/miniprintf.c **** 				uint >>= 4;
+ 470              		.loc 1 123 0
+ 471 0124 0929     		cmp	r1, #9
+ 472 0126 F5D8     		bhi	.L42
+ 473 0128 3022     		movs	r2, #48
+ 474 012a F4E7     		b	.L36
+ 475              	.LVL63:
+ 476              	.L45:
+ 126:Core/Src/miniprintf.c **** 			mini_write(mini,bptr);
+ 477              		.loc 1 126 0
+ 478 012c 3346     		mov	r3, r6
+ 479              	.LVL64:
+ 480 012e 2A46     		mov	r2, r5
+ 481 0130 4146     		mov	r1, r8
+ 482              	.LVL65:
+ 483 0132 3846     		mov	r0, r7
+ 484 0134 FFF7FEFF 		bl	mini_pad
+ 485              	.LVL66:
+ 127:Core/Src/miniprintf.c **** 			break;
+ 486              		.loc 1 127 0
+ 487 0138 3146     		mov	r1, r6
+ 488 013a 3846     		mov	r0, r7
+ 489 013c FFF7FEFF 		bl	mini_write
+ 490              	.LVL67:
+ 128:Core/Src/miniprintf.c **** 
+ 491              		.loc 1 128 0
+ 492 0140 64E7     		b	.L18
+ 493              	.LVL68:
+ 494              	.L31:
+ 131:Core/Src/miniprintf.c **** 			if ( sgn != '-' )
+ 495              		.loc 1 131 0
+ 496 0142 019B     		ldr	r3, [sp, #4]
+ 497 0144 1A1D     		adds	r2, r3, #4
+ 498 0146 0192     		str	r2, [sp, #4]
+ 499 0148 1E68     		ldr	r6, [r3]
+ 500              	.LVL69:
+ 132:Core/Src/miniprintf.c **** 				mini_pad(mini,pad,width,sptr);
+ 501              		.loc 1 132 0
+ 502 014a B9F12D0F 		cmp	r9, #45
+ 503 014e 0ED1     		bne	.L46
+ 504              	.L38:
+ 134:Core/Src/miniprintf.c **** 			if ( sgn == '-' )
+ 505              		.loc 1 134 0
+ 506 0150 3146     		mov	r1, r6
+ 507 0152 3846     		mov	r0, r7
+ 508 0154 FFF7FEFF 		bl	mini_write
+ 509              	.LVL70:
+ 135:Core/Src/miniprintf.c **** 				mini_pad(mini,pad,width,sptr);
+ 510              		.loc 1 135 0
+ 511 0158 B9F12D0F 		cmp	r9, #45
+ 512 015c 7FF456AF 		bne	.L18
+ 136:Core/Src/miniprintf.c **** 			break;
+ 513              		.loc 1 136 0
+ 514 0160 3346     		mov	r3, r6
+ 515 0162 2A46     		mov	r2, r5
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 15
+
+
+ 516 0164 4146     		mov	r1, r8
+ 517 0166 3846     		mov	r0, r7
+ 518 0168 FFF7FEFF 		bl	mini_pad
+ 519              	.LVL71:
+ 520 016c 4EE7     		b	.L18
+ 521              	.L46:
+ 133:Core/Src/miniprintf.c **** 			mini_write(mini,sptr);
+ 522              		.loc 1 133 0
+ 523 016e 3346     		mov	r3, r6
+ 524 0170 2A46     		mov	r2, r5
+ 525 0172 4146     		mov	r1, r8
+ 526 0174 3846     		mov	r0, r7
+ 527 0176 FFF7FEFF 		bl	mini_pad
+ 528              	.LVL72:
+ 529 017a E9E7     		b	.L38
+ 530              	.LVL73:
+ 531              	.L29:
+ 140:Core/Src/miniprintf.c **** 			break;
+ 532              		.loc 1 140 0
+ 533 017c 3B68     		ldr	r3, [r7]
+ 534 017e 7968     		ldr	r1, [r7, #4]
+ 535 0180 3046     		mov	r0, r6
+ 536 0182 9847     		blx	r3
+ 537              	.LVL74:
+ 141:Core/Src/miniprintf.c **** 
+ 538              		.loc 1 141 0
+ 539 0184 42E7     		b	.L18
+ 540              	.L26:
+ 144:Core/Src/miniprintf.c **** 			mini->putc('?',mini->argp);
+ 541              		.loc 1 144 0
+ 542 0186 3B68     		ldr	r3, [r7]
+ 543 0188 7968     		ldr	r1, [r7, #4]
+ 544 018a 2520     		movs	r0, #37
+ 545 018c 9847     		blx	r3
+ 546              	.LVL75:
+ 145:Core/Src/miniprintf.c **** 			mini->putc(ch,mini->argp);
+ 547              		.loc 1 145 0
+ 548 018e 3B68     		ldr	r3, [r7]
+ 549 0190 7968     		ldr	r1, [r7, #4]
+ 550 0192 3F20     		movs	r0, #63
+ 551 0194 9847     		blx	r3
+ 552              	.LVL76:
+ 146:Core/Src/miniprintf.c **** 		}
+ 553              		.loc 1 146 0
+ 554 0196 3B68     		ldr	r3, [r7]
+ 555 0198 7968     		ldr	r1, [r7, #4]
+ 556 019a 3046     		mov	r0, r6
+ 557 019c 9847     		blx	r3
+ 558              	.LVL77:
+ 559 019e 35E7     		b	.L18
+ 560              	.LVL78:
+ 561              	.L17:
+ 149:Core/Src/miniprintf.c **** 
+ 562              		.loc 1 149 0
+ 563 01a0 0BB0     		add	sp, sp, #44
+ 564              	.LCFI7:
+ 565              		.cfi_def_cfa_offset 28
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 16
+
+
+ 566              		@ sp needed
+ 567 01a2 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 568              	.LVL79:
+ 569              	.L48:
+ 570 01a6 00BF     		.align	2
+ 571              	.L47:
+ 572 01a8 67666666 		.word	1717986919
+ 573              		.cfi_endproc
+ 574              	.LFE2:
+ 576              		.section	.text.mini_vprintf0,"ax",%progbits
+ 577              		.align	1
+ 578              		.syntax unified
+ 579              		.thumb
+ 580              		.thumb_func
+ 581              		.fpu fpv5-d16
+ 583              	mini_vprintf0:
+ 584              	.LFB4:
+ 178:Core/Src/miniprintf.c **** 	miniarg_t mini;
+ 585              		.loc 1 178 0
+ 586              		.cfi_startproc
+ 587              		@ args = 0, pretend = 0, frame = 24
+ 588              		@ frame_needed = 0, uses_anonymous_args = 0
+ 589              	.LVL80:
+ 590 0000 10B5     		push	{r4, lr}
+ 591              	.LCFI8:
+ 592              		.cfi_def_cfa_offset 8
+ 593              		.cfi_offset 4, -8
+ 594              		.cfi_offset 14, -4
+ 595 0002 86B0     		sub	sp, sp, #24
+ 596              	.LCFI9:
+ 597              		.cfi_def_cfa_offset 32
+ 598 0004 1446     		mov	r4, r2
+ 182:Core/Src/miniprintf.c **** 	intern.count = 0u;		/* Byte counter */
+ 599              		.loc 1 182 0
+ 600 0006 0190     		str	r0, [sp, #4]
+ 183:Core/Src/miniprintf.c **** 	intern.cooked = !!cooked; 	/* True if LF to add CR */
+ 601              		.loc 1 183 0
+ 602 0008 0022     		movs	r2, #0
+ 603              	.LVL81:
+ 604 000a 0292     		str	r2, [sp, #8]
+ 184:Core/Src/miniprintf.c **** 
+ 605              		.loc 1 184 0
+ 606 000c 891A     		subs	r1, r1, r2
+ 607              	.LVL82:
+ 608 000e 18BF     		it	ne
+ 609 0010 0121     		movne	r1, #1
+ 610 0012 9DF80C20 		ldrb	r2, [sp, #12]	@ zero_extendqisi2
+ 611 0016 61F30002 		bfi	r2, r1, #0, #1
+ 612 001a 8DF80C20 		strb	r2, [sp, #12]
+ 186:Core/Src/miniprintf.c **** 	mini.argp = (void *)&intern; 	/* Ptr to internal struct */
+ 613              		.loc 1 186 0
+ 614 001e 064A     		ldr	r2, .L51
+ 615 0020 0492     		str	r2, [sp, #16]
+ 187:Core/Src/miniprintf.c **** 
+ 616              		.loc 1 187 0
+ 617 0022 01AA     		add	r2, sp, #4
+ 618 0024 0592     		str	r2, [sp, #20]
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 17
+
+
+ 189:Core/Src/miniprintf.c **** 	return intern.count;		/* Return byte count */
+ 619              		.loc 1 189 0
+ 620 0026 1A46     		mov	r2, r3
+ 621 0028 2146     		mov	r1, r4
+ 622 002a 04A8     		add	r0, sp, #16
+ 623              	.LVL83:
+ 624 002c FFF7FEFF 		bl	internal_vprintf
+ 625              	.LVL84:
+ 191:Core/Src/miniprintf.c **** 
+ 626              		.loc 1 191 0
+ 627 0030 0298     		ldr	r0, [sp, #8]
+ 628 0032 06B0     		add	sp, sp, #24
+ 629              	.LCFI10:
+ 630              		.cfi_def_cfa_offset 8
+ 631              		@ sp needed
+ 632 0034 10BD     		pop	{r4, pc}
+ 633              	.LVL85:
+ 634              	.L52:
+ 635 0036 00BF     		.align	2
+ 636              	.L51:
+ 637 0038 00000000 		.word	mini_putc
+ 638              		.cfi_endproc
+ 639              	.LFE4:
+ 641              		.section	.text.mini_vprintf_cooked,"ax",%progbits
+ 642              		.align	1
+ 643              		.global	mini_vprintf_cooked
+ 644              		.syntax unified
+ 645              		.thumb
+ 646              		.thumb_func
+ 647              		.fpu fpv5-d16
+ 649              	mini_vprintf_cooked:
+ 650              	.LFB5:
+ 197:Core/Src/miniprintf.c **** 	return mini_vprintf0(putc,1,format,args);
+ 651              		.loc 1 197 0
+ 652              		.cfi_startproc
+ 653              		@ args = 0, pretend = 0, frame = 0
+ 654              		@ frame_needed = 0, uses_anonymous_args = 0
+ 655              	.LVL86:
+ 656 0000 08B5     		push	{r3, lr}
+ 657              	.LCFI11:
+ 658              		.cfi_def_cfa_offset 8
+ 659              		.cfi_offset 3, -8
+ 660              		.cfi_offset 14, -4
+ 198:Core/Src/miniprintf.c **** }
+ 661              		.loc 1 198 0
+ 662 0002 1346     		mov	r3, r2
+ 663 0004 0A46     		mov	r2, r1
+ 664              	.LVL87:
+ 665 0006 0121     		movs	r1, #1
+ 666              	.LVL88:
+ 667 0008 FFF7FEFF 		bl	mini_vprintf0
+ 668              	.LVL89:
+ 199:Core/Src/miniprintf.c **** 
+ 669              		.loc 1 199 0
+ 670 000c 08BD     		pop	{r3, pc}
+ 671              		.cfi_endproc
+ 672              	.LFE5:
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 18
+
+
+ 674              		.section	.text.mini_vprintf_uncooked,"ax",%progbits
+ 675              		.align	1
+ 676              		.global	mini_vprintf_uncooked
+ 677              		.syntax unified
+ 678              		.thumb
+ 679              		.thumb_func
+ 680              		.fpu fpv5-d16
+ 682              	mini_vprintf_uncooked:
+ 683              	.LFB6:
+ 205:Core/Src/miniprintf.c **** 	return mini_vprintf0(putc,0,format,args);
+ 684              		.loc 1 205 0
+ 685              		.cfi_startproc
+ 686              		@ args = 0, pretend = 0, frame = 0
+ 687              		@ frame_needed = 0, uses_anonymous_args = 0
+ 688              	.LVL90:
+ 689 0000 08B5     		push	{r3, lr}
+ 690              	.LCFI12:
+ 691              		.cfi_def_cfa_offset 8
+ 692              		.cfi_offset 3, -8
+ 693              		.cfi_offset 14, -4
+ 206:Core/Src/miniprintf.c **** }
+ 694              		.loc 1 206 0
+ 695 0002 1346     		mov	r3, r2
+ 696 0004 0A46     		mov	r2, r1
+ 697              	.LVL91:
+ 698 0006 0021     		movs	r1, #0
+ 699              	.LVL92:
+ 700 0008 FFF7FEFF 		bl	mini_vprintf0
+ 701              	.LVL93:
+ 207:Core/Src/miniprintf.c **** 
+ 702              		.loc 1 207 0
+ 703 000c 08BD     		pop	{r3, pc}
+ 704              		.cfi_endproc
+ 705              	.LFE6:
+ 707              		.section	.text.mini_snprintf,"ax",%progbits
+ 708              		.align	1
+ 709              		.global	mini_snprintf
+ 710              		.syntax unified
+ 711              		.thumb
+ 712              		.thumb_func
+ 713              		.fpu fpv5-d16
+ 715              	mini_snprintf:
+ 716              	.LFB8:
+ 227:Core/Src/miniprintf.c **** 
+ 228:Core/Src/miniprintf.c **** /*
+ 229:Core/Src/miniprintf.c ****  * External: sprintf() to buffer (not cooked)
+ 230:Core/Src/miniprintf.c ****  */
+ 231:Core/Src/miniprintf.c **** int
+ 232:Core/Src/miniprintf.c **** mini_snprintf(char *buf,unsigned maxbuf,const char *format,...) {
+ 717              		.loc 1 232 0
+ 718              		.cfi_startproc
+ 719              		@ args = 4, pretend = 8, frame = 24
+ 720              		@ frame_needed = 0, uses_anonymous_args = 1
+ 721              	.LVL94:
+ 722 0000 0CB4     		push	{r2, r3}
+ 723              	.LCFI13:
+ 724              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 19
+
+
+ 725              		.cfi_offset 2, -8
+ 726              		.cfi_offset 3, -4
+ 727 0002 30B5     		push	{r4, r5, lr}
+ 728              	.LCFI14:
+ 729              		.cfi_def_cfa_offset 20
+ 730              		.cfi_offset 4, -20
+ 731              		.cfi_offset 5, -16
+ 732              		.cfi_offset 14, -12
+ 733 0004 87B0     		sub	sp, sp, #28
+ 734              	.LCFI15:
+ 735              		.cfi_def_cfa_offset 48
+ 736 0006 0AAA     		add	r2, sp, #40
+ 737 0008 52F8043B 		ldr	r3, [r2], #4
+ 233:Core/Src/miniprintf.c **** 	miniarg_t mini;			/* printf struct */
+ 234:Core/Src/miniprintf.c **** 	struct s_mini_sprintf ctl;	/* sprintf control */
+ 235:Core/Src/miniprintf.c **** 	va_list args;			/* format arguments */
+ 236:Core/Src/miniprintf.c **** 	unsigned count;			/* Return count */
+ 237:Core/Src/miniprintf.c **** 
+ 238:Core/Src/miniprintf.c **** 	mini.putc = mini_sputc;		/* Internal routine */
+ 738              		.loc 1 238 0
+ 739 000c 0C4C     		ldr	r4, .L59
+ 740 000e 0494     		str	r4, [sp, #16]
+ 239:Core/Src/miniprintf.c **** 	mini.argp = (void *)&ctl;	/* Using ctl to guide it */
+ 741              		.loc 1 239 0
+ 742 0010 01AD     		add	r5, sp, #4
+ 743 0012 0595     		str	r5, [sp, #20]
+ 240:Core/Src/miniprintf.c **** 
+ 241:Core/Src/miniprintf.c **** 	ctl.ptr = ctl.buf = buf;	/* Destination for data */
+ 744              		.loc 1 241 0
+ 745 0014 0190     		str	r0, [sp, #4]
+ 746 0016 0390     		str	r0, [sp, #12]
+ 242:Core/Src/miniprintf.c **** 	ctl.maxbuf = maxbuf;		/* Max size in bytes */
+ 747              		.loc 1 242 0
+ 748 0018 0291     		str	r1, [sp, #8]
+ 243:Core/Src/miniprintf.c **** 
+ 244:Core/Src/miniprintf.c **** 	va_start(args,format);
+ 749              		.loc 1 244 0
+ 750 001a 0092     		str	r2, [sp]
+ 245:Core/Src/miniprintf.c **** 	internal_vprintf(&mini,format,args);
+ 751              		.loc 1 245 0
+ 752 001c 1946     		mov	r1, r3
+ 753              	.LVL95:
+ 754 001e 04A8     		add	r0, sp, #16
+ 755              	.LVL96:
+ 756 0020 FFF7FEFF 		bl	internal_vprintf
+ 757              	.LVL97:
+ 246:Core/Src/miniprintf.c **** 	va_end(args);
+ 247:Core/Src/miniprintf.c **** 
+ 248:Core/Src/miniprintf.c **** 	count = (unsigned)(ctl.ptr - ctl.buf); /* Calculate count */
+ 758              		.loc 1 248 0
+ 759 0024 039C     		ldr	r4, [sp, #12]
+ 760 0026 019B     		ldr	r3, [sp, #4]
+ 761 0028 E41A     		subs	r4, r4, r3
+ 762              	.LVL98:
+ 249:Core/Src/miniprintf.c **** 	mini_sputc(0,&ctl);		/* Null terminate output if possible */
+ 763              		.loc 1 249 0
+ 764 002a 2946     		mov	r1, r5
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 20
+
+
+ 765 002c 0020     		movs	r0, #0
+ 766 002e FFF7FEFF 		bl	mini_sputc
+ 767              	.LVL99:
+ 250:Core/Src/miniprintf.c **** 	return count;			/* Return formatted count */
+ 251:Core/Src/miniprintf.c **** }
+ 768              		.loc 1 251 0
+ 769 0032 2046     		mov	r0, r4
+ 770 0034 07B0     		add	sp, sp, #28
+ 771              	.LCFI16:
+ 772              		.cfi_def_cfa_offset 20
+ 773              		@ sp needed
+ 774 0036 BDE83040 		pop	{r4, r5, lr}
+ 775              	.LCFI17:
+ 776              		.cfi_restore 14
+ 777              		.cfi_restore 5
+ 778              		.cfi_restore 4
+ 779              		.cfi_def_cfa_offset 8
+ 780              	.LVL100:
+ 781 003a 02B0     		add	sp, sp, #8
+ 782              	.LCFI18:
+ 783              		.cfi_restore 3
+ 784              		.cfi_restore 2
+ 785              		.cfi_def_cfa_offset 0
+ 786 003c 7047     		bx	lr
+ 787              	.L60:
+ 788 003e 00BF     		.align	2
+ 789              	.L59:
+ 790 0040 00000000 		.word	mini_sputc
+ 791              		.cfi_endproc
+ 792              	.LFE8:
+ 794              		.text
+ 795              	.Letext0:
+ 796              		.file 2 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 797              		.file 3 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 798              		.file 4 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 799              		.file 5 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 800              		.file 6 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 801              		.file 7 "<built-in>"
+ 802              		.file 8 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s 			page 21
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 miniprintf.c
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:17     .text.mini_write:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:23     .text.mini_write:0000000000000000 mini_write
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:64     .text.mini_putc:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:70     .text.mini_putc:0000000000000000 mini_putc
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:122    .text.mini_sputc:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:128    .text.mini_sputc:0000000000000000 mini_sputc
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:163    .text.mini_pad:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:169    .text.mini_pad:0000000000000000 mini_pad
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:220    .text.internal_vprintf:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:226    .text.internal_vprintf:0000000000000000 internal_vprintf
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:572    .text.internal_vprintf:00000000000001a8 $d
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:577    .text.mini_vprintf0:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:583    .text.mini_vprintf0:0000000000000000 mini_vprintf0
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:637    .text.mini_vprintf0:0000000000000038 $d
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:642    .text.mini_vprintf_cooked:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:649    .text.mini_vprintf_cooked:0000000000000000 mini_vprintf_cooked
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:675    .text.mini_vprintf_uncooked:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:682    .text.mini_vprintf_uncooked:0000000000000000 mini_vprintf_uncooked
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:708    .text.mini_snprintf:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:715    .text.mini_snprintf:0000000000000000 mini_snprintf
+C:\Users\rahma\AppData\Local\Temp\ccxvU8lO.s:790    .text.mini_snprintf:0000000000000040 $d
+
+UNDEFINED SYMBOLS
+strlen

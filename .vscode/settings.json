@@ -1,0 +1,28 @@
+{
+    "cortex-debug.armToolchainPath": ".",
+    "C_Cpp.errorSquiggles": "Enabled",
+    "files.associations": {
+        "i2c.h": "c",
+        "rcc.h": "c",
+        "i2c_common_v2.h": "c",
+        "i2c_oled.h": "c",
+        "nvic.h": "c",
+        "ssd1306.h": "c",
+        "ssd1306_conf.h": "c",
+        "_ansi.h": "c",
+        "stddef.h": "c",
+        "config.h": "c",
+        "newlib.h": "c",
+        "_newlib_version.h": "c",
+        "spi.h": "c",
+        "spi_common_v2.h": "c",
+        "timer.h": "c",
+        "gpio.h": "c",
+        "rcc_common_all.h": "c",
+        "systick.h": "c",
+        "timer_common_all.h": "c",
+        "string.h": "c",
+        "usart.h": "c",
+        "ssd1306_tests.h": "c"
+    }
+}

@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "name": "STM32",
+      "includePath": [
+        "../libopencm3-master/include",
+        "../libopencm3-master/lib/stm32/f7", 
+        "../libopencm3-master/lib/stm32/common", 
+        "../libopencm3-master/include/libopencm3/stm32/common",
+        "../libopencm3-master/include/libopencm3/stm32/f7",
+        "../libopencm3-master/lib/cm3",
+        "../STMems_Standard_C_drivers",
+        "../SSD1306/ssd1306",
+        "C:/VSARM/armcc/arm-none-eabi/include",
+        "Core/Inc"
+      ],
+      "defines": [
+        "STM32F7",
+        "STM32F767xx",
+        "STM32F7x7",
+        "STM32F7x",
+        "STM32F7xx",
+        "STM32F767ZI"
+      ],
+      "compilerPath": null
+    }
+  ],
+  "version": 4
+}

@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "taget": "uart_test",
+    "configurations": [
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "stutil",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/i2c_oled.elf",
+            "name": "Debug (ST-Util)",
+            "device": "STM32F767ZI",
+            "v1": false,
+            "svdFile": "${workspaceRoot}/STM32F7x7.svd"
+        },
+        {
+            "showDevDebugOutput": true,
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/i2c_oled.elf",
+            "name": "Debug STM32",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "preLaunchTask": "Build STM",
+            "device": "stlink",
+            "svdFile": "${workspaceRoot}/STM32F7x7.svd",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f7x.cfg"
+            ]
+        }
+    ]
+}

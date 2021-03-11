@@ -1,0 +1,1062 @@
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 28, 1
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"ssd1306_tests.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.section	.text.ssd1306_TestBorder,"ax",%progbits
+  17              		.align	1
+  18              		.global	ssd1306_TestBorder
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  22              		.fpu fpv5-d16
+  24              	ssd1306_TestBorder:
+  25              	.LFB3:
+  26              		.file 1 "../SSD1306/ssd1306/ssd1306_tests.c"
+   1:../SSD1306/ssd1306/ssd1306_tests.c **** #include <string.h>
+   2:../SSD1306/ssd1306/ssd1306_tests.c **** #include <stdio.h>
+   3:../SSD1306/ssd1306/ssd1306_tests.c **** #include "ssd1306.h"
+   4:../SSD1306/ssd1306/ssd1306_tests.c **** #include "ssd1306_tests.h"
+   5:../SSD1306/ssd1306/ssd1306_tests.c **** extern uint32_t ticks;
+   6:../SSD1306/ssd1306/ssd1306_tests.c **** void ssd1306_TestBorder() {
+  27              		.loc 1 6 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31 0000 70B5     		push	{r4, r5, r6, lr}
+  32              	.LCFI0:
+  33              		.cfi_def_cfa_offset 16
+  34              		.cfi_offset 4, -16
+  35              		.cfi_offset 5, -12
+  36              		.cfi_offset 6, -8
+  37              		.cfi_offset 14, -4
+   7:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_Fill(Black);
+  38              		.loc 1 7 0
+  39 0002 0020     		movs	r0, #0
+  40 0004 FFF7FEFF 		bl	ssd1306_Fill
+  41              	.LVL0:
+   8:../SSD1306/ssd1306/ssd1306_tests.c ****    
+   9:../SSD1306/ssd1306/ssd1306_tests.c ****     uint32_t start = ticks;
+  42              		.loc 1 9 0
+  43 0008 1F4B     		ldr	r3, .L9
+  44 000a 1E68     		ldr	r6, [r3]
+  45              	.LVL1:
+  10:../SSD1306/ssd1306/ssd1306_tests.c ****     uint32_t end = start;
+  11:../SSD1306/ssd1306/ssd1306_tests.c ****     uint8_t x = 0;
+  12:../SSD1306/ssd1306/ssd1306_tests.c ****     uint8_t y = 0;
+  46              		.loc 1 12 0
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 2
+
+
+  47 000c 0025     		movs	r5, #0
+  11:../SSD1306/ssd1306/ssd1306_tests.c ****     uint8_t y = 0;
+  48              		.loc 1 11 0
+  49 000e 2C46     		mov	r4, r5
+  50 0010 15E0     		b	.L6
+  51              	.LVL2:
+  52              	.L2:
+  53              	.LBB2:
+  13:../SSD1306/ssd1306/ssd1306_tests.c ****     do {
+  14:../SSD1306/ssd1306/ssd1306_tests.c ****         ssd1306_DrawPixel(x, y, Black);
+  15:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  16:../SSD1306/ssd1306/ssd1306_tests.c ****         if((y == 0) && (x < 127))
+  17:../SSD1306/ssd1306/ssd1306_tests.c ****             x++;
+  18:../SSD1306/ssd1306/ssd1306_tests.c ****         else if((x == 127) && (y < (SSD1306_HEIGHT-1)))
+  54              		.loc 1 18 0
+  55 0012 1E2D     		cmp	r5, #30
+  56 0014 98BF     		it	ls
+  57 0016 7F2C     		cmpls	r4, #127
+  58 0018 22D1     		bne	.L4
+  19:../SSD1306/ssd1306/ssd1306_tests.c ****             y++;
+  59              		.loc 1 19 0
+  60 001a 0135     		adds	r5, r5, #1
+  61              	.LVL3:
+  62 001c EDB2     		uxtb	r5, r5
+  63              	.LVL4:
+  64              	.L3:
+  20:../SSD1306/ssd1306/ssd1306_tests.c ****         else if((y == (SSD1306_HEIGHT-1)) && (x > 0)) 
+  21:../SSD1306/ssd1306/ssd1306_tests.c ****             x--;
+  22:../SSD1306/ssd1306/ssd1306_tests.c ****         else
+  23:../SSD1306/ssd1306/ssd1306_tests.c ****             y--;
+  24:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  25:../SSD1306/ssd1306/ssd1306_tests.c ****         ssd1306_DrawPixel(x, y, White);
+  65              		.loc 1 25 0
+  66 001e 0122     		movs	r2, #1
+  67 0020 2946     		mov	r1, r5
+  68 0022 2046     		mov	r0, r4
+  69 0024 FFF7FEFF 		bl	ssd1306_DrawPixel
+  70              	.LVL5:
+  26:../SSD1306/ssd1306/ssd1306_tests.c ****         ssd1306_UpdateScreen();
+  71              		.loc 1 26 0
+  72 0028 FFF7FEFF 		bl	ssd1306_UpdateScreen
+  73              	.LVL6:
+  27:../SSD1306/ssd1306/ssd1306_tests.c ****     
+  28:../SSD1306/ssd1306/ssd1306_tests.c ****         delay_ms(5);
+  74              		.loc 1 28 0
+  75 002c 0520     		movs	r0, #5
+  76 002e FFF7FEFF 		bl	delay_ms
+  77              	.LVL7:
+  29:../SSD1306/ssd1306/ssd1306_tests.c ****         end = ticks;
+  78              		.loc 1 29 0
+  79 0032 154B     		ldr	r3, .L9
+  80 0034 1B68     		ldr	r3, [r3]
+  81              	.LVL8:
+  82              	.LBE2:
+  30:../SSD1306/ssd1306/ssd1306_tests.c ****     } while((end - start) < 8000);
+  83              		.loc 1 30 0
+  84 0036 9B1B     		subs	r3, r3, r6
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 3
+
+
+  85              	.LVL9:
+  86 0038 B3F5FA5F 		cmp	r3, #8000
+  87 003c 1ED2     		bcs	.L8
+  88              	.LVL10:
+  89              	.L6:
+  90              	.LBB3:
+  14:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  91              		.loc 1 14 0
+  92 003e 0022     		movs	r2, #0
+  93 0040 2946     		mov	r1, r5
+  94 0042 2046     		mov	r0, r4
+  95 0044 FFF7FEFF 		bl	ssd1306_DrawPixel
+  96              	.LVL11:
+  16:../SSD1306/ssd1306/ssd1306_tests.c ****             x++;
+  97              		.loc 1 16 0
+  98 0048 7E2C     		cmp	r4, #126
+  99 004a 8CBF     		ite	hi
+ 100 004c 0023     		movhi	r3, #0
+ 101 004e 0123     		movls	r3, #1
+ 102 0050 002D     		cmp	r5, #0
+ 103 0052 18BF     		it	ne
+ 104 0054 0023     		movne	r3, #0
+ 105 0056 002B     		cmp	r3, #0
+ 106 0058 DBD0     		beq	.L2
+  17:../SSD1306/ssd1306/ssd1306_tests.c ****         else if((x == 127) && (y < (SSD1306_HEIGHT-1)))
+ 107              		.loc 1 17 0
+ 108 005a 0134     		adds	r4, r4, #1
+ 109              	.LVL12:
+ 110 005c E4B2     		uxtb	r4, r4
+ 111              	.LVL13:
+ 112 005e DEE7     		b	.L3
+ 113              	.L4:
+  20:../SSD1306/ssd1306/ssd1306_tests.c ****             x--;
+ 114              		.loc 1 20 0
+ 115 0060 1F2D     		cmp	r5, #31
+ 116 0062 14BF     		ite	ne
+ 117 0064 0023     		movne	r3, #0
+ 118 0066 0123     		moveq	r3, #1
+ 119 0068 002C     		cmp	r4, #0
+ 120 006a 08BF     		it	eq
+ 121 006c 0023     		moveq	r3, #0
+ 122 006e 13B1     		cbz	r3, .L5
+  21:../SSD1306/ssd1306/ssd1306_tests.c ****         else
+ 123              		.loc 1 21 0
+ 124 0070 013C     		subs	r4, r4, #1
+ 125              	.LVL14:
+ 126 0072 E4B2     		uxtb	r4, r4
+ 127              	.LVL15:
+ 128 0074 D3E7     		b	.L3
+ 129              	.L5:
+  23:../SSD1306/ssd1306/ssd1306_tests.c **** 
+ 130              		.loc 1 23 0
+ 131 0076 013D     		subs	r5, r5, #1
+ 132              	.LVL16:
+ 133 0078 EDB2     		uxtb	r5, r5
+ 134              	.LVL17:
+ 135 007a D0E7     		b	.L3
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 4
+
+
+ 136              	.LVL18:
+ 137              	.L8:
+ 138              	.LBE3:
+  31:../SSD1306/ssd1306/ssd1306_tests.c ****    
+  32:../SSD1306/ssd1306/ssd1306_tests.c ****     delay_ms(1000);
+ 139              		.loc 1 32 0
+ 140 007c 4FF47A70 		mov	r0, #1000
+ 141 0080 FFF7FEFF 		bl	delay_ms
+ 142              	.LVL19:
+  33:../SSD1306/ssd1306/ssd1306_tests.c **** }
+ 143              		.loc 1 33 0
+ 144 0084 70BD     		pop	{r4, r5, r6, pc}
+ 145              	.LVL20:
+ 146              	.L10:
+ 147 0086 00BF     		.align	2
+ 148              	.L9:
+ 149 0088 00000000 		.word	ticks
+ 150              		.cfi_endproc
+ 151              	.LFE3:
+ 153              		.section	.text.ssd1306_TestFonts,"ax",%progbits
+ 154              		.align	1
+ 155              		.global	ssd1306_TestFonts
+ 156              		.syntax unified
+ 157              		.thumb
+ 158              		.thumb_func
+ 159              		.fpu fpv5-d16
+ 161              	ssd1306_TestFonts:
+ 162              	.LFB4:
+  34:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  35:../SSD1306/ssd1306/ssd1306_tests.c **** void ssd1306_TestFonts() {
+ 163              		.loc 1 35 0
+ 164              		.cfi_startproc
+ 165              		@ args = 0, pretend = 0, frame = 0
+ 166              		@ frame_needed = 0, uses_anonymous_args = 0
+ 167 0000 08B5     		push	{r3, lr}
+ 168              	.LCFI1:
+ 169              		.cfi_def_cfa_offset 8
+ 170              		.cfi_offset 3, -8
+ 171              		.cfi_offset 14, -4
+  36:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_Fill(Black);
+ 172              		.loc 1 36 0
+ 173 0002 0020     		movs	r0, #0
+ 174 0004 FFF7FEFF 		bl	ssd1306_Fill
+ 175              	.LVL21:
+  37:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_SetCursor(2, 0);
+ 176              		.loc 1 37 0
+ 177 0008 0021     		movs	r1, #0
+ 178 000a 0220     		movs	r0, #2
+ 179 000c FFF7FEFF 		bl	ssd1306_SetCursor
+ 180              	.LVL22:
+  38:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_WriteString("Font 16x26", Font_16x26, White);
+ 181              		.loc 1 38 0
+ 182 0010 134A     		ldr	r2, .L13
+ 183 0012 0123     		movs	r3, #1
+ 184 0014 06CA     		ldm	r2, {r1, r2}
+ 185 0016 1348     		ldr	r0, .L13+4
+ 186 0018 FFF7FEFF 		bl	ssd1306_WriteString
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 5
+
+
+ 187              	.LVL23:
+  39:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_SetCursor(2, 26);
+ 188              		.loc 1 39 0
+ 189 001c 1A21     		movs	r1, #26
+ 190 001e 0220     		movs	r0, #2
+ 191 0020 FFF7FEFF 		bl	ssd1306_SetCursor
+ 192              	.LVL24:
+  40:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_WriteString("Font 11x18", Font_11x18, White);
+ 193              		.loc 1 40 0
+ 194 0024 104A     		ldr	r2, .L13+8
+ 195 0026 0123     		movs	r3, #1
+ 196 0028 06CA     		ldm	r2, {r1, r2}
+ 197 002a 1048     		ldr	r0, .L13+12
+ 198 002c FFF7FEFF 		bl	ssd1306_WriteString
+ 199              	.LVL25:
+  41:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_SetCursor(2, 26+18);
+ 200              		.loc 1 41 0
+ 201 0030 2C21     		movs	r1, #44
+ 202 0032 0220     		movs	r0, #2
+ 203 0034 FFF7FEFF 		bl	ssd1306_SetCursor
+ 204              	.LVL26:
+  42:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_WriteString("Font 7x10", Font_7x10, White);
+ 205              		.loc 1 42 0
+ 206 0038 0D4A     		ldr	r2, .L13+16
+ 207 003a 0123     		movs	r3, #1
+ 208 003c 06CA     		ldm	r2, {r1, r2}
+ 209 003e 0D48     		ldr	r0, .L13+20
+ 210 0040 FFF7FEFF 		bl	ssd1306_WriteString
+ 211              	.LVL27:
+  43:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_SetCursor(2, 26+18+10);
+ 212              		.loc 1 43 0
+ 213 0044 3621     		movs	r1, #54
+ 214 0046 0220     		movs	r0, #2
+ 215 0048 FFF7FEFF 		bl	ssd1306_SetCursor
+ 216              	.LVL28:
+  44:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_WriteString("Font 6x8", Font_6x8, White);
+ 217              		.loc 1 44 0
+ 218 004c 0A4A     		ldr	r2, .L13+24
+ 219 004e 0123     		movs	r3, #1
+ 220 0050 06CA     		ldm	r2, {r1, r2}
+ 221 0052 0A48     		ldr	r0, .L13+28
+ 222 0054 FFF7FEFF 		bl	ssd1306_WriteString
+ 223              	.LVL29:
+  45:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_UpdateScreen();
+ 224              		.loc 1 45 0
+ 225 0058 FFF7FEFF 		bl	ssd1306_UpdateScreen
+ 226              	.LVL30:
+  46:../SSD1306/ssd1306/ssd1306_tests.c **** }
+ 227              		.loc 1 46 0
+ 228 005c 08BD     		pop	{r3, pc}
+ 229              	.L14:
+ 230 005e 00BF     		.align	2
+ 231              	.L13:
+ 232 0060 00000000 		.word	Font_16x26
+ 233 0064 00000000 		.word	.LC1
+ 234 0068 00000000 		.word	Font_11x18
+ 235 006c 0C000000 		.word	.LC2
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 6
+
+
+ 236 0070 00000000 		.word	Font_7x10
+ 237 0074 18000000 		.word	.LC3
+ 238 0078 00000000 		.word	Font_6x8
+ 239 007c 24000000 		.word	.LC4
+ 240              		.cfi_endproc
+ 241              	.LFE4:
+ 243              		.section	.text.ssd1306_TestFPS,"ax",%progbits
+ 244              		.align	1
+ 245              		.global	ssd1306_TestFPS
+ 246              		.syntax unified
+ 247              		.thumb
+ 248              		.thumb_func
+ 249              		.fpu fpv5-d16
+ 251              	ssd1306_TestFPS:
+ 252              	.LFB5:
+  47:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  48:../SSD1306/ssd1306/ssd1306_tests.c **** void ssd1306_TestFPS() {
+ 253              		.loc 1 48 0
+ 254              		.cfi_startproc
+ 255              		@ args = 0, pretend = 0, frame = 80
+ 256              		@ frame_needed = 0, uses_anonymous_args = 0
+ 257 0000 70B5     		push	{r4, r5, r6, lr}
+ 258              	.LCFI2:
+ 259              		.cfi_def_cfa_offset 16
+ 260              		.cfi_offset 4, -16
+ 261              		.cfi_offset 5, -12
+ 262              		.cfi_offset 6, -8
+ 263              		.cfi_offset 14, -4
+ 264 0002 94B0     		sub	sp, sp, #80
+ 265              	.LCFI3:
+ 266              		.cfi_def_cfa_offset 96
+  49:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_Fill(White);
+ 267              		.loc 1 49 0
+ 268 0004 0120     		movs	r0, #1
+ 269 0006 FFF7FEFF 		bl	ssd1306_Fill
+ 270              	.LVL31:
+  50:../SSD1306/ssd1306/ssd1306_tests.c ****    
+  51:../SSD1306/ssd1306/ssd1306_tests.c ****     uint32_t start = ticks;
+ 271              		.loc 1 51 0
+ 272 000a 314B     		ldr	r3, .L18+8
+ 273 000c 1E68     		ldr	r6, [r3]
+ 274              	.LVL32:
+  52:../SSD1306/ssd1306/ssd1306_tests.c ****     uint32_t end = start;
+  53:../SSD1306/ssd1306/ssd1306_tests.c ****     int fps = 0;
+  54:../SSD1306/ssd1306/ssd1306_tests.c ****     char message[] = "ABCDEFGHIJK";
+ 275              		.loc 1 54 0
+ 276 000e 314B     		ldr	r3, .L18+12
+ 277 0010 93E80700 		ldm	r3, {r0, r1, r2}
+ 278 0014 14AB     		add	r3, sp, #80
+ 279 0016 03E90700 		stmdb	r3, {r0, r1, r2}
+  55:../SSD1306/ssd1306/ssd1306_tests.c ****    
+  56:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_SetCursor(2,0);
+ 280              		.loc 1 56 0
+ 281 001a 0021     		movs	r1, #0
+ 282 001c 0220     		movs	r0, #2
+ 283 001e FFF7FEFF 		bl	ssd1306_SetCursor
+ 284              	.LVL33:
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 7
+
+
+  57:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_WriteString("Testing...", Font_11x18, Black);
+ 285              		.loc 1 57 0
+ 286 0022 2D4A     		ldr	r2, .L18+16
+ 287 0024 0023     		movs	r3, #0
+ 288 0026 06CA     		ldm	r2, {r1, r2}
+ 289 0028 2C48     		ldr	r0, .L18+20
+ 290 002a FFF7FEFF 		bl	ssd1306_WriteString
+ 291              	.LVL34:
+  53:../SSD1306/ssd1306/ssd1306_tests.c ****     char message[] = "ABCDEFGHIJK";
+ 292              		.loc 1 53 0
+ 293 002e 0025     		movs	r5, #0
+ 294              	.LVL35:
+ 295              	.L16:
+ 296              	.LBB4:
+  58:../SSD1306/ssd1306/ssd1306_tests.c ****    
+  59:../SSD1306/ssd1306/ssd1306_tests.c ****     do {
+  60:../SSD1306/ssd1306/ssd1306_tests.c ****         ssd1306_SetCursor(2, 18);
+ 297              		.loc 1 60 0 discriminator 1
+ 298 0030 1221     		movs	r1, #18
+ 299 0032 0220     		movs	r0, #2
+ 300 0034 FFF7FEFF 		bl	ssd1306_SetCursor
+ 301              	.LVL36:
+  61:../SSD1306/ssd1306/ssd1306_tests.c ****         ssd1306_WriteString(message, Font_11x18, Black);
+ 302              		.loc 1 61 0 discriminator 1
+ 303 0038 274A     		ldr	r2, .L18+16
+ 304 003a 0023     		movs	r3, #0
+ 305 003c 06CA     		ldm	r2, {r1, r2}
+ 306 003e 11A8     		add	r0, sp, #68
+ 307 0040 FFF7FEFF 		bl	ssd1306_WriteString
+ 308              	.LVL37:
+  62:../SSD1306/ssd1306/ssd1306_tests.c ****         ssd1306_UpdateScreen();
+ 309              		.loc 1 62 0 discriminator 1
+ 310 0044 FFF7FEFF 		bl	ssd1306_UpdateScreen
+ 311              	.LVL38:
+  63:../SSD1306/ssd1306/ssd1306_tests.c ****        
+  64:../SSD1306/ssd1306/ssd1306_tests.c ****         char ch = message[0];
+ 312              		.loc 1 64 0 discriminator 1
+ 313 0048 9DF84440 		ldrb	r4, [sp, #68]	@ zero_extendqisi2
+ 314              	.LVL39:
+  65:../SSD1306/ssd1306/ssd1306_tests.c ****         memmove(message, message+1, sizeof(message)-2);
+ 315              		.loc 1 65 0 discriminator 1
+ 316 004c 0A22     		movs	r2, #10
+ 317 004e 0DF14501 		add	r1, sp, #69
+ 318 0052 11A8     		add	r0, sp, #68
+ 319 0054 FFF7FEFF 		bl	memmove
+ 320              	.LVL40:
+  66:../SSD1306/ssd1306/ssd1306_tests.c ****         message[sizeof(message)-2] = ch;
+ 321              		.loc 1 66 0 discriminator 1
+ 322 0058 8DF84E40 		strb	r4, [sp, #78]
+  67:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  68:../SSD1306/ssd1306/ssd1306_tests.c ****         fps++;
+ 323              		.loc 1 68 0 discriminator 1
+ 324 005c 0135     		adds	r5, r5, #1
+ 325              	.LVL41:
+  69:../SSD1306/ssd1306/ssd1306_tests.c ****         end = ticks;
+ 326              		.loc 1 69 0 discriminator 1
+ 327 005e 1C4B     		ldr	r3, .L18+8
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 8
+
+
+ 328 0060 1C68     		ldr	r4, [r3]
+ 329              	.LVL42:
+ 330              	.LBE4:
+  70:../SSD1306/ssd1306/ssd1306_tests.c ****     } while((end - start) < 5000);
+ 331              		.loc 1 70 0 discriminator 1
+ 332 0062 A41B     		subs	r4, r4, r6
+ 333              	.LVL43:
+ 334 0064 41F28733 		movw	r3, #4999
+ 335              	.LVL44:
+ 336 0068 9C42     		cmp	r4, r3
+ 337 006a E1D9     		bls	.L16
+  71:../SSD1306/ssd1306/ssd1306_tests.c ****    
+  72:../SSD1306/ssd1306/ssd1306_tests.c ****     delay_ms(1000);
+ 338              		.loc 1 72 0
+ 339 006c 4FF47A70 		mov	r0, #1000
+ 340 0070 FFF7FEFF 		bl	delay_ms
+ 341              	.LVL45:
+  73:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  74:../SSD1306/ssd1306/ssd1306_tests.c ****     char buff[64];
+  75:../SSD1306/ssd1306/ssd1306_tests.c ****     fps = (float)fps / ((end - start) / 1000.0);
+ 342              		.loc 1 75 0
+ 343 0074 07EE905A 		vmov	s15, r5	@ int
+ 344 0078 B8EEE76A 		vcvt.f32.s32	s12, s15
+ 345 007c B7EEC66A 		vcvt.f64.f32	d6, s12
+ 346 0080 07EE904A 		vmov	s15, r4	@ int
+ 347 0084 B8EE677B 		vcvt.f64.u32	d7, s15
+ 348 0088 9FED0F4B 		vldr.64	d4, .L18
+ 349 008c 87EE045B 		vdiv.f64	d5, d7, d4
+ 350 0090 86EE057B 		vdiv.f64	d7, d6, d5
+ 351              	.LVL46:
+  76:../SSD1306/ssd1306/ssd1306_tests.c ****     snprintf(buff, sizeof(buff), "~%d FPS", fps);
+ 352              		.loc 1 76 0
+ 353 0094 FDEEC77B 		vcvt.s32.f64	s15, d7
+ 354              	.LVL47:
+ 355 0098 17EE903A 		vmov	r3, s15	@ int
+ 356 009c 104A     		ldr	r2, .L18+24
+ 357 009e 4021     		movs	r1, #64
+ 358 00a0 01A8     		add	r0, sp, #4
+ 359 00a2 FFF7FEFF 		bl	snprintf
+ 360              	.LVL48:
+  77:../SSD1306/ssd1306/ssd1306_tests.c ****    
+  78:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_Fill(White);
+ 361              		.loc 1 78 0
+ 362 00a6 0120     		movs	r0, #1
+ 363 00a8 FFF7FEFF 		bl	ssd1306_Fill
+ 364              	.LVL49:
+  79:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_SetCursor(2, 2);
+ 365              		.loc 1 79 0
+ 366 00ac 0221     		movs	r1, #2
+ 367 00ae 0846     		mov	r0, r1
+ 368 00b0 FFF7FEFF 		bl	ssd1306_SetCursor
+ 369              	.LVL50:
+  80:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_WriteString(buff, Font_11x18, Black);
+ 370              		.loc 1 80 0
+ 371 00b4 084A     		ldr	r2, .L18+16
+ 372 00b6 0023     		movs	r3, #0
+ 373 00b8 06CA     		ldm	r2, {r1, r2}
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 9
+
+
+ 374 00ba 01A8     		add	r0, sp, #4
+ 375 00bc FFF7FEFF 		bl	ssd1306_WriteString
+ 376              	.LVL51:
+  81:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_UpdateScreen();
+ 377              		.loc 1 81 0
+ 378 00c0 FFF7FEFF 		bl	ssd1306_UpdateScreen
+ 379              	.LVL52:
+  82:../SSD1306/ssd1306/ssd1306_tests.c **** }
+ 380              		.loc 1 82 0
+ 381 00c4 14B0     		add	sp, sp, #80
+ 382              	.LCFI4:
+ 383              		.cfi_def_cfa_offset 16
+ 384              		@ sp needed
+ 385 00c6 70BD     		pop	{r4, r5, r6, pc}
+ 386              	.LVL53:
+ 387              	.L19:
+ 388              		.align	3
+ 389              	.L18:
+ 390 00c8 00000000 		.word	0
+ 391 00cc 00408F40 		.word	1083129856
+ 392 00d0 00000000 		.word	ticks
+ 393 00d4 14000000 		.word	.LC5
+ 394 00d8 00000000 		.word	Font_11x18
+ 395 00dc 00000000 		.word	.LC6
+ 396 00e0 0C000000 		.word	.LC7
+ 397              		.cfi_endproc
+ 398              	.LFE5:
+ 400              		.section	.text.ssd1306_TestLine,"ax",%progbits
+ 401              		.align	1
+ 402              		.global	ssd1306_TestLine
+ 403              		.syntax unified
+ 404              		.thumb
+ 405              		.thumb_func
+ 406              		.fpu fpv5-d16
+ 408              	ssd1306_TestLine:
+ 409              	.LFB6:
+  83:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  84:../SSD1306/ssd1306/ssd1306_tests.c **** void ssd1306_TestLine() {
+ 410              		.loc 1 84 0
+ 411              		.cfi_startproc
+ 412              		@ args = 0, pretend = 0, frame = 0
+ 413              		@ frame_needed = 0, uses_anonymous_args = 0
+ 414 0000 10B5     		push	{r4, lr}
+ 415              	.LCFI5:
+ 416              		.cfi_def_cfa_offset 8
+ 417              		.cfi_offset 4, -8
+ 418              		.cfi_offset 14, -4
+ 419 0002 82B0     		sub	sp, sp, #8
+ 420              	.LCFI6:
+ 421              		.cfi_def_cfa_offset 16
+  85:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  86:../SSD1306/ssd1306/ssd1306_tests.c ****   ssd1306_Line(1,1,SSD1306_WIDTH - 1,SSD1306_HEIGHT - 1,White);
+ 422              		.loc 1 86 0
+ 423 0004 0124     		movs	r4, #1
+ 424 0006 0094     		str	r4, [sp]
+ 425 0008 1F23     		movs	r3, #31
+ 426 000a 7F22     		movs	r2, #127
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 10
+
+
+ 427 000c 2146     		mov	r1, r4
+ 428 000e 2046     		mov	r0, r4
+ 429 0010 FFF7FEFF 		bl	ssd1306_Line
+ 430              	.LVL54:
+  87:../SSD1306/ssd1306/ssd1306_tests.c ****   ssd1306_Line(SSD1306_WIDTH - 1,1,1,SSD1306_HEIGHT - 1,White);
+ 431              		.loc 1 87 0
+ 432 0014 0094     		str	r4, [sp]
+ 433 0016 1F23     		movs	r3, #31
+ 434 0018 2246     		mov	r2, r4
+ 435 001a 2146     		mov	r1, r4
+ 436 001c 7F20     		movs	r0, #127
+ 437 001e FFF7FEFF 		bl	ssd1306_Line
+ 438              	.LVL55:
+  88:../SSD1306/ssd1306/ssd1306_tests.c ****   ssd1306_UpdateScreen();
+ 439              		.loc 1 88 0
+ 440 0022 FFF7FEFF 		bl	ssd1306_UpdateScreen
+ 441              	.LVL56:
+  89:../SSD1306/ssd1306/ssd1306_tests.c ****   return;
+  90:../SSD1306/ssd1306/ssd1306_tests.c **** }
+ 442              		.loc 1 90 0
+ 443 0026 02B0     		add	sp, sp, #8
+ 444              	.LCFI7:
+ 445              		.cfi_def_cfa_offset 8
+ 446              		@ sp needed
+ 447 0028 10BD     		pop	{r4, pc}
+ 448              		.cfi_endproc
+ 449              	.LFE6:
+ 451              		.section	.text.ssd1306_TestRectangle,"ax",%progbits
+ 452              		.align	1
+ 453              		.global	ssd1306_TestRectangle
+ 454              		.syntax unified
+ 455              		.thumb
+ 456              		.thumb_func
+ 457              		.fpu fpv5-d16
+ 459              	ssd1306_TestRectangle:
+ 460              	.LFB7:
+  91:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  92:../SSD1306/ssd1306/ssd1306_tests.c **** void ssd1306_TestRectangle() {
+ 461              		.loc 1 92 0
+ 462              		.cfi_startproc
+ 463              		@ args = 0, pretend = 0, frame = 0
+ 464              		@ frame_needed = 0, uses_anonymous_args = 0
+ 465 0000 10B5     		push	{r4, lr}
+ 466              	.LCFI8:
+ 467              		.cfi_def_cfa_offset 8
+ 468              		.cfi_offset 4, -8
+ 469              		.cfi_offset 14, -4
+ 470 0002 82B0     		sub	sp, sp, #8
+ 471              	.LCFI9:
+ 472              		.cfi_def_cfa_offset 16
+ 473              	.LVL57:
+  93:../SSD1306/ssd1306/ssd1306_tests.c ****   uint32_t delta;
+  94:../SSD1306/ssd1306/ssd1306_tests.c **** 
+  95:../SSD1306/ssd1306/ssd1306_tests.c ****   for(delta = 0; delta < 5; delta ++) {
+ 474              		.loc 1 95 0
+ 475 0004 0024     		movs	r4, #0
+ 476 0006 10E0     		b	.L23
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 11
+
+
+ 477              	.LVL58:
+ 478              	.L24:
+  96:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_DrawRectangle(1 + (5*delta),1 + (5*delta) ,SSD1306_WIDTH-1 - (5*delta),SSD1306_HEIGHT-1
+ 479              		.loc 1 96 0 discriminator 3
+ 480 0008 04EB8402 		add	r2, r4, r4, lsl #2
+ 481 000c D2B2     		uxtb	r2, r2
+ 482 000e 501C     		adds	r0, r2, #1
+ 483 0010 C0B2     		uxtb	r0, r0
+ 484 0012 C2F11F03 		rsb	r3, r2, #31
+ 485 0016 C2F17F02 		rsb	r2, r2, #127
+ 486 001a 0121     		movs	r1, #1
+ 487 001c 0091     		str	r1, [sp]
+ 488 001e DBB2     		uxtb	r3, r3
+ 489 0020 D2B2     		uxtb	r2, r2
+ 490 0022 0146     		mov	r1, r0
+ 491 0024 FFF7FEFF 		bl	ssd1306_DrawRectangle
+ 492              	.LVL59:
+  95:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_DrawRectangle(1 + (5*delta),1 + (5*delta) ,SSD1306_WIDTH-1 - (5*delta),SSD1306_HEIGHT-1
+ 493              		.loc 1 95 0 discriminator 3
+ 494 0028 0134     		adds	r4, r4, #1
+ 495              	.LVL60:
+ 496              	.L23:
+  95:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_DrawRectangle(1 + (5*delta),1 + (5*delta) ,SSD1306_WIDTH-1 - (5*delta),SSD1306_HEIGHT-1
+ 497              		.loc 1 95 0 is_stmt 0 discriminator 1
+ 498 002a 042C     		cmp	r4, #4
+ 499 002c ECD9     		bls	.L24
+  97:../SSD1306/ssd1306/ssd1306_tests.c ****   }
+  98:../SSD1306/ssd1306/ssd1306_tests.c ****   ssd1306_UpdateScreen();
+ 500              		.loc 1 98 0 is_stmt 1
+ 501 002e FFF7FEFF 		bl	ssd1306_UpdateScreen
+ 502              	.LVL61:
+  99:../SSD1306/ssd1306/ssd1306_tests.c ****   return;
+ 100:../SSD1306/ssd1306/ssd1306_tests.c **** }
+ 503              		.loc 1 100 0
+ 504 0032 02B0     		add	sp, sp, #8
+ 505              	.LCFI10:
+ 506              		.cfi_def_cfa_offset 8
+ 507              		@ sp needed
+ 508 0034 10BD     		pop	{r4, pc}
+ 509              		.cfi_endproc
+ 510              	.LFE7:
+ 512              		.section	.text.ssd1306_TestCircle,"ax",%progbits
+ 513              		.align	1
+ 514              		.global	ssd1306_TestCircle
+ 515              		.syntax unified
+ 516              		.thumb
+ 517              		.thumb_func
+ 518              		.fpu fpv5-d16
+ 520              	ssd1306_TestCircle:
+ 521              	.LFB8:
+ 101:../SSD1306/ssd1306/ssd1306_tests.c **** 
+ 102:../SSD1306/ssd1306/ssd1306_tests.c **** void ssd1306_TestCircle() {
+ 522              		.loc 1 102 0
+ 523              		.cfi_startproc
+ 524              		@ args = 0, pretend = 0, frame = 0
+ 525              		@ frame_needed = 0, uses_anonymous_args = 0
+ 526 0000 10B5     		push	{r4, lr}
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 12
+
+
+ 527              	.LCFI11:
+ 528              		.cfi_def_cfa_offset 8
+ 529              		.cfi_offset 4, -8
+ 530              		.cfi_offset 14, -4
+ 531              	.LVL62:
+ 103:../SSD1306/ssd1306/ssd1306_tests.c ****   uint32_t delta;
+ 104:../SSD1306/ssd1306/ssd1306_tests.c **** 
+ 105:../SSD1306/ssd1306/ssd1306_tests.c ****   for(delta = 0; delta < 5; delta ++) {
+ 532              		.loc 1 105 0
+ 533 0002 0024     		movs	r4, #0
+ 534 0004 0BE0     		b	.L27
+ 535              	.LVL63:
+ 536              	.L28:
+ 106:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_DrawCircle(20* delta+30, 15, 10, White);
+ 537              		.loc 1 106 0 discriminator 3
+ 538 0006 04EB8403 		add	r3, r4, r4, lsl #2
+ 539 000a 9800     		lsls	r0, r3, #2
+ 540 000c 1E30     		adds	r0, r0, #30
+ 541 000e 0123     		movs	r3, #1
+ 542 0010 0A22     		movs	r2, #10
+ 543 0012 0F21     		movs	r1, #15
+ 544 0014 00F0FE00 		and	r0, r0, #254
+ 545 0018 FFF7FEFF 		bl	ssd1306_DrawCircle
+ 546              	.LVL64:
+ 105:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_DrawCircle(20* delta+30, 15, 10, White);
+ 547              		.loc 1 105 0 discriminator 3
+ 548 001c 0134     		adds	r4, r4, #1
+ 549              	.LVL65:
+ 550              	.L27:
+ 105:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_DrawCircle(20* delta+30, 15, 10, White);
+ 551              		.loc 1 105 0 is_stmt 0 discriminator 1
+ 552 001e 042C     		cmp	r4, #4
+ 553 0020 F1D9     		bls	.L28
+ 107:../SSD1306/ssd1306/ssd1306_tests.c ****   }
+ 108:../SSD1306/ssd1306/ssd1306_tests.c ****   ssd1306_UpdateScreen();
+ 554              		.loc 1 108 0 is_stmt 1
+ 555 0022 FFF7FEFF 		bl	ssd1306_UpdateScreen
+ 556              	.LVL66:
+ 109:../SSD1306/ssd1306/ssd1306_tests.c ****   return;
+ 110:../SSD1306/ssd1306/ssd1306_tests.c **** }
+ 557              		.loc 1 110 0
+ 558 0026 10BD     		pop	{r4, pc}
+ 559              		.cfi_endproc
+ 560              	.LFE8:
+ 562              		.section	.text.ssd1306_TestArc,"ax",%progbits
+ 563              		.align	1
+ 564              		.global	ssd1306_TestArc
+ 565              		.syntax unified
+ 566              		.thumb
+ 567              		.thumb_func
+ 568              		.fpu fpv5-d16
+ 570              	ssd1306_TestArc:
+ 571              	.LFB9:
+ 111:../SSD1306/ssd1306/ssd1306_tests.c **** 
+ 112:../SSD1306/ssd1306/ssd1306_tests.c **** void ssd1306_TestArc() {
+ 572              		.loc 1 112 0
+ 573              		.cfi_startproc
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 13
+
+
+ 574              		@ args = 0, pretend = 0, frame = 0
+ 575              		@ frame_needed = 0, uses_anonymous_args = 0
+ 576 0000 00B5     		push	{lr}
+ 577              	.LCFI12:
+ 578              		.cfi_def_cfa_offset 4
+ 579              		.cfi_offset 14, -4
+ 580 0002 83B0     		sub	sp, sp, #12
+ 581              	.LCFI13:
+ 582              		.cfi_def_cfa_offset 16
+ 113:../SSD1306/ssd1306/ssd1306_tests.c ****   ssd1306_DrawArc(30, 30, 30, 20, 270, White);
+ 583              		.loc 1 113 0
+ 584 0004 0123     		movs	r3, #1
+ 585 0006 0193     		str	r3, [sp, #4]
+ 586 0008 4FF48773 		mov	r3, #270
+ 587 000c 0093     		str	r3, [sp]
+ 588 000e 1423     		movs	r3, #20
+ 589 0010 1E22     		movs	r2, #30
+ 590 0012 1146     		mov	r1, r2
+ 591 0014 1046     		mov	r0, r2
+ 592 0016 FFF7FEFF 		bl	ssd1306_DrawArc
+ 593              	.LVL67:
+ 114:../SSD1306/ssd1306/ssd1306_tests.c ****   ssd1306_UpdateScreen();
+ 594              		.loc 1 114 0
+ 595 001a FFF7FEFF 		bl	ssd1306_UpdateScreen
+ 596              	.LVL68:
+ 115:../SSD1306/ssd1306/ssd1306_tests.c ****   return;
+ 116:../SSD1306/ssd1306/ssd1306_tests.c **** }
+ 597              		.loc 1 116 0
+ 598 001e 03B0     		add	sp, sp, #12
+ 599              	.LCFI14:
+ 600              		.cfi_def_cfa_offset 4
+ 601              		@ sp needed
+ 602 0020 5DF804FB 		ldr	pc, [sp], #4
+ 603              		.cfi_endproc
+ 604              	.LFE9:
+ 606              		.section	.text.ssd1306_TestPolyline,"ax",%progbits
+ 607              		.align	1
+ 608              		.global	ssd1306_TestPolyline
+ 609              		.syntax unified
+ 610              		.thumb
+ 611              		.thumb_func
+ 612              		.fpu fpv5-d16
+ 614              	ssd1306_TestPolyline:
+ 615              	.LFB10:
+ 117:../SSD1306/ssd1306/ssd1306_tests.c **** 
+ 118:../SSD1306/ssd1306/ssd1306_tests.c **** void ssd1306_TestPolyline() {
+ 616              		.loc 1 118 0
+ 617              		.cfi_startproc
+ 618              		@ args = 0, pretend = 0, frame = 16
+ 619              		@ frame_needed = 0, uses_anonymous_args = 0
+ 620 0000 10B5     		push	{r4, lr}
+ 621              	.LCFI15:
+ 622              		.cfi_def_cfa_offset 8
+ 623              		.cfi_offset 4, -8
+ 624              		.cfi_offset 14, -4
+ 625 0002 84B0     		sub	sp, sp, #16
+ 626              	.LCFI16:
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 14
+
+
+ 627              		.cfi_def_cfa_offset 24
+ 119:../SSD1306/ssd1306/ssd1306_tests.c ****   SSD1306_VERTEX loc_vertex[] =
+ 628              		.loc 1 119 0
+ 629 0004 064B     		ldr	r3, .L34
+ 630 0006 6C46     		mov	r4, sp
+ 631 0008 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 632 000a 07C4     		stmia	r4!, {r0, r1, r2}
+ 633 000c 2380     		strh	r3, [r4]	@ movhi
+ 120:../SSD1306/ssd1306/ssd1306_tests.c ****   {
+ 121:../SSD1306/ssd1306/ssd1306_tests.c ****       {35,40},
+ 122:../SSD1306/ssd1306/ssd1306_tests.c ****       {40,20},
+ 123:../SSD1306/ssd1306/ssd1306_tests.c ****       {45,28},
+ 124:../SSD1306/ssd1306/ssd1306_tests.c ****       {50,10},
+ 125:../SSD1306/ssd1306/ssd1306_tests.c ****       {45,16},
+ 126:../SSD1306/ssd1306/ssd1306_tests.c ****       {50,10},
+ 127:../SSD1306/ssd1306/ssd1306_tests.c ****       {53,16}
+ 128:../SSD1306/ssd1306/ssd1306_tests.c ****   };
+ 129:../SSD1306/ssd1306/ssd1306_tests.c **** 
+ 130:../SSD1306/ssd1306/ssd1306_tests.c ****   ssd1306_Polyline(loc_vertex,sizeof(loc_vertex)/sizeof(loc_vertex[0]),White);
+ 634              		.loc 1 130 0
+ 635 000e 0122     		movs	r2, #1
+ 636 0010 0721     		movs	r1, #7
+ 637 0012 6846     		mov	r0, sp
+ 638 0014 FFF7FEFF 		bl	ssd1306_Polyline
+ 639              	.LVL69:
+ 131:../SSD1306/ssd1306/ssd1306_tests.c ****   ssd1306_UpdateScreen();
+ 640              		.loc 1 131 0
+ 641 0018 FFF7FEFF 		bl	ssd1306_UpdateScreen
+ 642              	.LVL70:
+ 132:../SSD1306/ssd1306/ssd1306_tests.c ****   return;
+ 133:../SSD1306/ssd1306/ssd1306_tests.c **** }
+ 643              		.loc 1 133 0
+ 644 001c 04B0     		add	sp, sp, #16
+ 645              	.LCFI17:
+ 646              		.cfi_def_cfa_offset 8
+ 647              		@ sp needed
+ 648 001e 10BD     		pop	{r4, pc}
+ 649              	.L35:
+ 650              		.align	2
+ 651              	.L34:
+ 652 0020 00000000 		.word	.LANCHOR0
+ 653              		.cfi_endproc
+ 654              	.LFE10:
+ 656              		.section	.text.ssd1306_TestAll,"ax",%progbits
+ 657              		.align	1
+ 658              		.global	ssd1306_TestAll
+ 659              		.syntax unified
+ 660              		.thumb
+ 661              		.thumb_func
+ 662              		.fpu fpv5-d16
+ 664              	ssd1306_TestAll:
+ 665              	.LFB11:
+ 134:../SSD1306/ssd1306/ssd1306_tests.c **** 
+ 135:../SSD1306/ssd1306/ssd1306_tests.c **** void ssd1306_TestAll() {
+ 666              		.loc 1 135 0
+ 667              		.cfi_startproc
+ 668              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 15
+
+
+ 669              		@ frame_needed = 0, uses_anonymous_args = 0
+ 670 0000 08B5     		push	{r3, lr}
+ 671              	.LCFI18:
+ 672              		.cfi_def_cfa_offset 8
+ 673              		.cfi_offset 3, -8
+ 674              		.cfi_offset 14, -4
+ 136:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_Init();
+ 675              		.loc 1 136 0
+ 676 0002 FFF7FEFF 		bl	ssd1306_Init
+ 677              	.LVL71:
+ 137:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_TestFPS();
+ 678              		.loc 1 137 0
+ 679 0006 FFF7FEFF 		bl	ssd1306_TestFPS
+ 680              	.LVL72:
+ 138:../SSD1306/ssd1306/ssd1306_tests.c ****     delay_ms(3000);
+ 681              		.loc 1 138 0
+ 682 000a 40F6B830 		movw	r0, #3000
+ 683 000e FFF7FEFF 		bl	delay_ms
+ 684              	.LVL73:
+ 139:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_TestBorder();
+ 685              		.loc 1 139 0
+ 686 0012 FFF7FEFF 		bl	ssd1306_TestBorder
+ 687              	.LVL74:
+ 140:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_TestFonts();
+ 688              		.loc 1 140 0
+ 689 0016 FFF7FEFF 		bl	ssd1306_TestFonts
+ 690              	.LVL75:
+ 141:../SSD1306/ssd1306/ssd1306_tests.c ****     delay_ms(3000);
+ 691              		.loc 1 141 0
+ 692 001a 40F6B830 		movw	r0, #3000
+ 693 001e FFF7FEFF 		bl	delay_ms
+ 694              	.LVL76:
+ 142:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_Fill(Black);
+ 695              		.loc 1 142 0
+ 696 0022 0020     		movs	r0, #0
+ 697 0024 FFF7FEFF 		bl	ssd1306_Fill
+ 698              	.LVL77:
+ 143:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_TestRectangle();
+ 699              		.loc 1 143 0
+ 700 0028 FFF7FEFF 		bl	ssd1306_TestRectangle
+ 701              	.LVL78:
+ 144:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_TestLine();
+ 702              		.loc 1 144 0
+ 703 002c FFF7FEFF 		bl	ssd1306_TestLine
+ 704              	.LVL79:
+ 145:../SSD1306/ssd1306/ssd1306_tests.c ****     delay_ms(3000);
+ 705              		.loc 1 145 0
+ 706 0030 40F6B830 		movw	r0, #3000
+ 707 0034 FFF7FEFF 		bl	delay_ms
+ 708              	.LVL80:
+ 146:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_Fill(Black);
+ 709              		.loc 1 146 0
+ 710 0038 0020     		movs	r0, #0
+ 711 003a FFF7FEFF 		bl	ssd1306_Fill
+ 712              	.LVL81:
+ 147:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_TestPolyline();
+ 713              		.loc 1 147 0
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 16
+
+
+ 714 003e FFF7FEFF 		bl	ssd1306_TestPolyline
+ 715              	.LVL82:
+ 148:../SSD1306/ssd1306/ssd1306_tests.c ****     delay_ms(3000);
+ 716              		.loc 1 148 0
+ 717 0042 40F6B830 		movw	r0, #3000
+ 718 0046 FFF7FEFF 		bl	delay_ms
+ 719              	.LVL83:
+ 149:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_Fill(Black);
+ 720              		.loc 1 149 0
+ 721 004a 0020     		movs	r0, #0
+ 722 004c FFF7FEFF 		bl	ssd1306_Fill
+ 723              	.LVL84:
+ 150:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_TestArc();
+ 724              		.loc 1 150 0
+ 725 0050 FFF7FEFF 		bl	ssd1306_TestArc
+ 726              	.LVL85:
+ 151:../SSD1306/ssd1306/ssd1306_tests.c ****     delay_ms(3000);
+ 727              		.loc 1 151 0
+ 728 0054 40F6B830 		movw	r0, #3000
+ 729 0058 FFF7FEFF 		bl	delay_ms
+ 730              	.LVL86:
+ 152:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_Fill(Black);
+ 731              		.loc 1 152 0
+ 732 005c 0020     		movs	r0, #0
+ 733 005e FFF7FEFF 		bl	ssd1306_Fill
+ 734              	.LVL87:
+ 153:../SSD1306/ssd1306/ssd1306_tests.c ****     ssd1306_TestCircle();
+ 735              		.loc 1 153 0
+ 736 0062 FFF7FEFF 		bl	ssd1306_TestCircle
+ 737              	.LVL88:
+ 154:../SSD1306/ssd1306/ssd1306_tests.c ****     delay_ms(3000);
+ 738              		.loc 1 154 0
+ 739 0066 40F6B830 		movw	r0, #3000
+ 740 006a FFF7FEFF 		bl	delay_ms
+ 741              	.LVL89:
+ 155:../SSD1306/ssd1306/ssd1306_tests.c **** }
+ 742              		.loc 1 155 0
+ 743 006e 08BD     		pop	{r3, pc}
+ 744              		.cfi_endproc
+ 745              	.LFE11:
+ 747              		.section	.rodata
+ 748              		.align	2
+ 749              		.set	.LANCHOR0,. + 0
+ 750              	.LC0:
+ 751 0000 23       		.byte	35
+ 752 0001 28       		.byte	40
+ 753 0002 28       		.byte	40
+ 754 0003 14       		.byte	20
+ 755 0004 2D       		.byte	45
+ 756 0005 1C       		.byte	28
+ 757 0006 32       		.byte	50
+ 758 0007 0A       		.byte	10
+ 759 0008 2D       		.byte	45
+ 760 0009 10       		.byte	16
+ 761 000a 32       		.byte	50
+ 762 000b 0A       		.byte	10
+ 763 000c 35       		.byte	53
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 17
+
+
+ 764 000d 10       		.byte	16
+ 765              		.section	.rodata.ssd1306_TestFPS.str1.4,"aMS",%progbits,1
+ 766              		.align	2
+ 767              	.LC6:
+ 768 0000 54657374 		.ascii	"Testing...\000"
+ 768      696E672E 
+ 768      2E2E00
+ 769 000b 00       		.space	1
+ 770              	.LC7:
+ 771 000c 7E256420 		.ascii	"~%d FPS\000"
+ 771      46505300 
+ 772              	.LC5:
+ 773 0014 41424344 		.ascii	"ABCDEFGHIJK\000"
+ 773      45464748 
+ 773      494A4B00 
+ 774              		.section	.rodata.ssd1306_TestFonts.str1.4,"aMS",%progbits,1
+ 775              		.align	2
+ 776              	.LC1:
+ 777 0000 466F6E74 		.ascii	"Font 16x26\000"
+ 777      20313678 
+ 777      323600
+ 778 000b 00       		.space	1
+ 779              	.LC2:
+ 780 000c 466F6E74 		.ascii	"Font 11x18\000"
+ 780      20313178 
+ 780      313800
+ 781 0017 00       		.space	1
+ 782              	.LC3:
+ 783 0018 466F6E74 		.ascii	"Font 7x10\000"
+ 783      20377831 
+ 783      3000
+ 784 0022 0000     		.space	2
+ 785              	.LC4:
+ 786 0024 466F6E74 		.ascii	"Font 6x8\000"
+ 786      20367838 
+ 786      00
+ 787              		.text
+ 788              	.Letext0:
+ 789              		.file 2 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 790              		.file 3 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 791              		.file 4 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 792              		.file 5 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 793              		.file 6 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 794              		.file 7 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.externa
+ 795              		.file 8 "../SSD1306/ssd1306/ssd1306_fonts.h"
+ 796              		.file 9 "../SSD1306/ssd1306/ssd1306.h"
+ 797              		.file 10 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.extern
+ 798              		.file 11 "d:\\programs\\stm32cubeide_1.4.0\\stm32cubeide\\plugins\\com.st.stm32cube.ide.mcu.extern
+ARM GAS  C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s 			page 18
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 ssd1306_tests.c
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:17     .text.ssd1306_TestBorder:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:24     .text.ssd1306_TestBorder:0000000000000000 ssd1306_TestBorder
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:149    .text.ssd1306_TestBorder:0000000000000088 $d
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:154    .text.ssd1306_TestFonts:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:161    .text.ssd1306_TestFonts:0000000000000000 ssd1306_TestFonts
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:232    .text.ssd1306_TestFonts:0000000000000060 $d
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:244    .text.ssd1306_TestFPS:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:251    .text.ssd1306_TestFPS:0000000000000000 ssd1306_TestFPS
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:390    .text.ssd1306_TestFPS:00000000000000c8 $d
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:401    .text.ssd1306_TestLine:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:408    .text.ssd1306_TestLine:0000000000000000 ssd1306_TestLine
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:452    .text.ssd1306_TestRectangle:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:459    .text.ssd1306_TestRectangle:0000000000000000 ssd1306_TestRectangle
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:513    .text.ssd1306_TestCircle:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:520    .text.ssd1306_TestCircle:0000000000000000 ssd1306_TestCircle
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:563    .text.ssd1306_TestArc:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:570    .text.ssd1306_TestArc:0000000000000000 ssd1306_TestArc
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:607    .text.ssd1306_TestPolyline:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:614    .text.ssd1306_TestPolyline:0000000000000000 ssd1306_TestPolyline
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:652    .text.ssd1306_TestPolyline:0000000000000020 $d
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:657    .text.ssd1306_TestAll:0000000000000000 $t
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:664    .text.ssd1306_TestAll:0000000000000000 ssd1306_TestAll
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:748    .rodata:0000000000000000 $d
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:766    .rodata.ssd1306_TestFPS.str1.4:0000000000000000 $d
+C:\Users\rahma\AppData\Local\Temp\cc4lISGS.s:775    .rodata.ssd1306_TestFonts.str1.4:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+ssd1306_Fill
+ssd1306_DrawPixel
+ssd1306_UpdateScreen
+delay_ms
+ticks
+ssd1306_SetCursor
+ssd1306_WriteString
+Font_16x26
+Font_11x18
+Font_7x10
+Font_6x8
+memmove
+snprintf
+ssd1306_Line
+ssd1306_DrawRectangle
+ssd1306_DrawCircle
+ssd1306_DrawArc
+ssd1306_Polyline
+ssd1306_Init
